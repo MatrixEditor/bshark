@@ -1,0 +1,2 @@
+aidl@git+https://github.com/MatrixEditor/aidl-parser.git
+rich
