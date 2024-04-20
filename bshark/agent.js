@@ -21,9 +21,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// TODO: add support for 32bit and other Android architectures
-
 const libbinder = "libbinder.so"
+const x86 = (Process.arch == "ia32" || Process.arch == "arm");
 var ANDROID_VERSION = 12;
 var VERBOSE = false;
 
@@ -52,11 +51,27 @@ function Parcel64(ptr) {
     }
 }
 
+function Parcel32(ptr) {
+    return {
+        ptr: ptr,
+        get error() { return this.ptr.readU32(); },
+        get data() { return this.ptr.add(4).readPointer(); },
+        get dataSize() { return this.ptr.add(8).readU32(); },
+        get dataCapacity() { return this.ptr.add(12).readU32(); },
+        get dataPos() { return this.ptr.add(16).readU32(); },
+        get rawData() { return this.data.readByteArray(this.dataSize); }
+    }
+}
+
+
 function Descriptor(ptr) {
     return {
         ptr: ptr,
         get length() { return this.ptr.add(12).readU32(); },
-        get name() { return this.ptr.add(16).readUtf16String(this.length); }
+        get name() {
+            var pos = ANDROID_VERSION >= 10 ? 16 : 8;
+            return this.ptr.add(pos).readUtf16String(this.length);
+        }
     }
 }
 
@@ -74,22 +89,37 @@ Interceptor.attach(
         /**
          * The function signature is: (at least for Android 12)
          *
-         * android::IPCThreadState::transact(int, unsigned int, android::Parcel const&, android::Parcel*, unsigned int)
+         * android::IPCThreadState::transact(
+         *      int,
+         *      unsigned int,
+         *      android::Parcel const&,
+         *      android::Parcel*,
+         *      unsigned int
+         * );
          */
         onEnter: function (args) {
-            console.log("\n[TRANSACTION] handle=" + args[0] + ", code=" + args[2] + ", data=" + args[3] + ", reply=" + args[4] + ", flags=" + args[5]);
+            if (VERBOSE) {
+                console.log(
+                    "\n[TRANSACTION] arg0=" + args[0]
+                    + ", handle=" + args[1]
+                    + ", code=" + args[2]
+                    + ", data=" + args[3]
+                    + ", reply=" + args[4]
+                    + ", flags=" + args[5]
+                );
+            }
 
             // There seems to be another parameter after the handle
             var dataPtr = args[3];
-            this.parcel = Parcel64(dataPtr);
+            this.parcel = x86 ? Parcel64(dataPtr) : Parcel32(dataPtr);
 
             var replyPtr = args[4];
-            this.reply = Parcel64(replyPtr);
+            this.reply = x86 ? Parcel64(replyPtr) : Parcel32(replyPtr);
             this.code = args[2].toInt32();
 
             if (this.parcel.data.isNull()) {
-                console.log(" | Data is NULL!");
-                return;
+                if (VERBOSE) console.log(" | Data is NULL!");
+                return; // REVISIT: maybe include errors
             }
             var interfaceName = Descriptor(this.parcel.data);
             this.descriptor = interfaceName.name;

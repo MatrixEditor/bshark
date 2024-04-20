@@ -4,6 +4,11 @@ from setuptools import Extension, setup
 setup(
     name="bshark",
     packages=["bshark"],
+    requires=[
+        "tree-sitter",
+        "rich",
+        "caterpillar@git+https://github.com/MatrixEditor/caterpillar.git",
+    ],
     package_data={
         "bshark": ["*.pyi", "py.typed", "*.js"],
     },
