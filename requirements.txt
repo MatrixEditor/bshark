@@ -1,3 +1,4 @@
 caterpillar@git+https://github.com/MatrixEditor/caterpillar.git
 rich
+tree-sitter
 setuptools
