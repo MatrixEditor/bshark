@@ -79,8 +79,8 @@ class Type(enum.Enum):
     BINDER = 2  # conforms to an interface
     """An interface definition (binder) from an AIDL file."""
 
-    SPECIAL = 3  # unused
-    UNDEFINED = 4  # unused
+    SPECIAL = 3  # unuised
+    UNDEFINED = 4  # internal use only
 
 
 @dataclass(slots=True)
@@ -105,7 +105,7 @@ class Unit:
     body: Node
     """The unit's AST
 
-    Note that this value may be a `ParcelableDef` of `BinderDef`
+    Note that this value may be a :class:`~bshark.compiler.model.ParcelableDef` of :class:`~bshark.compiler.model.BinderDef`
     if imported through a JSON file.
     """
 
@@ -223,11 +223,3 @@ def get_parameter_modifier(program: Node) -> str:
     if param_type in ("in", "out", "inout"):
         return param_type
     return "in"
-
-
-# --- extra model helpers ---
-# @dataclass(frozen=True, init=False)
-# class IMethodInvocation:
-#     qualifier: str
-#     name: str
-#     arguments: t.List[Node]

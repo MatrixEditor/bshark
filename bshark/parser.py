@@ -27,7 +27,7 @@ class Parser:
                 f"Only compiled binder definitions are supported (at {qname!r})"
             )
 
-        interface: BinderDef = units[0].body
+        interface: BinderDef = units[0]
         # The transaction code will be stored in the root context
         code = context._root.code
         mdef = next(filter(lambda x: x.tc == code, interface.methods), None)

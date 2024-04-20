@@ -1,7 +1,7 @@
 import enum
 
 from caterpillar.shortcuts import struct, LittleEndian, ctx
-from caterpillar.fields import uint32, Memory, Enum, singleton, String
+from caterpillar.fields import uint32, Memory, Enum, singleton, String, Computed
 
 from bshark.parser import Parser
 from bshark.compiler.model import Direction
@@ -63,6 +63,7 @@ def parse_outgoing_message(data: memoryview, context):
 
 @struct
 class OutgoingMessage:
+    descriptor: Computed(ctx._root.interface)
     data: Memory(...) >> parse_outgoing_message
 
 

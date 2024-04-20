@@ -11,7 +11,6 @@ from bshark.aidl import (
     get_methods,
     get_binder_methods,
     get_parameters,
-    get_method_return_type,
     get_parameter_modifier,
     get_class_by_name,
     Constants,
@@ -35,7 +34,7 @@ from bshark.compiler.model import (
     Primitive,
     UnsupportedTypeError,
 )
-from bshark.compiler.loader2 import BaseLoader
+from bshark.compiler.loader import BaseLoader
 from bshark.compiler.util import get_declaring_class
 
 
@@ -46,7 +45,6 @@ PARCEL_QNAME = f"android.os.{PARCEL_TYPE_NAME}"
 # --- internal method ---
 def txt(node: Node) -> t.Optional[str]:
     return node.text.decode() if node else None
-
 
 # ---
 
@@ -66,6 +64,8 @@ class Preprocessor:
         self.members: t.Dict[str, Node] = self._get_members()
         self.methods: t.Dict[str, Node] = self._get_methods()
         self.constructors: t.List[Node] = self._get_constructors()
+        self.extends: t.List[str] = self._get_superclasses()
+        self.implements: t.List[str] = self._get_interfaces()
 
     @property
     def lang(self) -> Language:
@@ -82,7 +82,7 @@ class Preprocessor:
     @property
     def rpath(self) -> RPath:
         """Returns the relative path of the unit."""
-        path = self.qname.replace(".", "/")
+        path = get_declaring_class(self.qname).replace(".", "/")
         if self.unit.type == Type.PARCELABLE_JAVA:
             return f"{path}.java"
         if self.is_compiled():
@@ -99,6 +99,10 @@ class Preprocessor:
     def is_compiled(self) -> bool:
         """Returns whether the unit is already compiled."""
         return isinstance(self.unit.body, (ParcelableDef, BinderDef))
+
+    def is_valid(self) -> bool:
+        """Returns whether the unit is valid."""
+        return self.unit.body is not None
 
     def get_creator(self) -> t.Optional[Node]:
         """Resolves the CREATOR field in a parcelable class."""
@@ -141,7 +145,7 @@ class Preprocessor:
         This method will return a dictionary with the field's name
         mapped to the field's type.
         """
-        if self.is_compiled():
+        if self.is_compiled() or not self.is_valid():
             return {}
 
         body = self.declared_class.child_by_field_name("body")
@@ -160,7 +164,7 @@ class Preprocessor:
         This method will return a dictionary with the method's name
         mapped to the method's body.
         """
-        if self.is_compiled():
+        if self.is_compiled() or not self.is_valid():
             return {}
 
         if self.unit.type == Type.BINDER:
@@ -171,12 +175,40 @@ class Preprocessor:
 
     def _get_constructors(self) -> t.List[Node]:
         """Returns the constructors of the current unit."""
-        if self.is_compiled():
+        if self.is_compiled() or not self.is_valid():
             return []
 
         query = self.lang.query(f"({Constants.CONSTUCTOR_DECL}) @type")
         body = self.declared_class.child_by_field_name("body")
         return [x for x, _ in query.captures(self.unit.body) if x.parent == body]
+
+    def _get_superclasses(self) -> t.List[str]:
+        """Returns the superclasses of the current unit."""
+        if self.is_compiled() or not self.is_valid():
+            return {}
+
+        query = self.lang.query("(superclass) @type")
+        results = query.captures(self.unit.body)
+        return [
+            txt(result.named_child(0))
+            for result, _ in results
+            if result.parent == self.unit.body
+        ]
+
+    def _get_interfaces(self) -> t.List[str]:
+        """Returns the interfaces of the current unit."""
+        if self.is_compiled() or not self.is_valid():
+            return {}
+
+        query = self.lang.query("(super_interfaces) @type")
+        results = query.captures(self.unit.body)
+        interfaces = []
+        for super_interfaces, _ in results:
+            if super_interfaces.parent == self.unit.body:
+                interfaces.extend(
+                    [txt(x) for x in super_interfaces.named_child(0).named_children]
+                )
+        return interfaces
 
 
 class TypeHandler:
@@ -214,6 +246,16 @@ class TypeHandler:
                         return f"readList:{Complex.VALUES[ref_ty]}"
                     idef = compiler.get_import(ref_ty)
                     return f"readList:{idef.qname}"
+
+                case "ParceledListSlice":
+                    if arguments.child_count == 0:
+                        return f"readParcelable{array}:android.app.ParceledListSlice"
+
+                    ref_ty = arguments.named_child(0).text.decode()
+                    if ref_ty in Complex.VALUES:
+                        return f"readParceledListSlice:{Complex.VALUES[ref_ty]}"
+                    idef = compiler.get_import(ref_ty)
+                    return f"readParceledListSlice:{idef.qname}"
 
                 case _:
                     raise TypeError(
@@ -386,6 +428,11 @@ class NodeVisitor:
             #   2. Delegate parsing to a local method
             if qualifier is not None:
                 # try to resolve the type of the delegate
+                if qualifier == "super":
+                    # call to super class
+                    idef = self.compiler.get_import(self.compiler.info.extends[0])
+                    return [FieldDef("_super", f"readParcelable:{idef.qname}")]
+
                 member_ty = self.compiler.info.members[qualifier].child_by_field_name(
                     "type"
                 )
@@ -404,8 +451,8 @@ class NodeVisitor:
 class Compiler:
     """
     The _compiler_ class is used to translate given AIDL definitions into
-    a pre-defined structure that is used by the :class:`Decoder` and
-    :class:`Encoder` classes.
+    a pre-defined structure that can be used to decode and potentially
+    encode data.
 
     The internal processing depends on which type the underlying unit was
     associated with. For instance, :code:`BINDER` declarations will result

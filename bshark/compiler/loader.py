@@ -17,7 +17,7 @@ from bshark.aidl import (
     Type,
 )
 from bshark.compiler.util import get_qname, filteraidl
-from bshark.compiler.model import QName, RPath, ABSPath, Type, from_json
+from bshark.compiler.model import QName, RPath, ABSPath, from_json
 
 
 class BaseLoader:
@@ -56,18 +56,23 @@ class BaseLoader:
         if "." in name:
             parts = name.split(".")
             name = parts[-1]
-            parent = ".".join([parent] + parts[:-1])
+            parent = ".".join(parts[:-1])
 
         class_decl = get_class_by_name(unit.root_node, name, JAVA)
         if not class_decl:
-            raise ValueError(f"Could not find class {name!r} in {abs_path}")
+            # TODO: maybe add internal variable
+            # raise ValueError(f"Could not find class {name!r} in {abs_path}")
+            pass
 
         # Package must be queried from the root node
         package = get_package(unit.root_node, JAVA)
+        if parent == package:
+            parent = None
+
         imports = get_imports(unit.root_node, JAVA)
         qname = f"{package}.{name}" if not parent else f"{package}.{parent}.{name}"
         self.ucache[qname] = Unit(
-            package,
+            qname.rsplit(".", 1)[0],
             imports,
             name,
             Type.PARCELABLE_JAVA,

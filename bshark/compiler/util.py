@@ -18,8 +18,8 @@ def get_qname(path: RPath) -> QName:
 def get_declaring_class(qname: QName) -> QName:
     parts = qname.split(".")
     classes = len(list(filter(lambda x: x[0].isupper(), parts)))
-    idx = - (classes - 1)
-    return ".".join(parts[:idx]) if idx > 0 else qname
+    idx = classes - 1
+    return ".".join(parts[:-idx]) if idx > 0 else qname
 
 
 def to_qname(unit: Unit) -> QName:
