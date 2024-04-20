@@ -9,7 +9,7 @@ setup(
     name="bshark",
     packages=["bshark"],
     package_data={
-        "bshark": ["*.pyi", "py.typed"],
+        "bshark": ["*.pyi", "py.typed", "*.js"],
     },
     ext_modules=[
         Extension(
