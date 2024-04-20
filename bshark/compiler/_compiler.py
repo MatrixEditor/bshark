@@ -1,9 +1,21 @@
 import os
 import typing as t
-import aidl
+
+from tree_sitter import Node, Language
 
 from bshark import FULL_AIDL_EXT
-
+from bshark.aidl import (
+    AIDL,
+    JAVA,
+    Unit,
+    get_methods,
+    get_binder_methods,
+    get_parameters,
+    get_method_return_type,
+    get_parameter_modifier,
+    get_class_by_name,
+    Constants,
+)
 from bshark.compiler.model import (
     ParcelableDef,
     BinderDef,
@@ -16,7 +28,6 @@ from bshark.compiler.model import (
     ImportDef,
     ImportDefList,
     Direction,
-    Unit,
     QName,
     RPath,
     Type,
@@ -24,713 +35,758 @@ from bshark.compiler.model import (
     Primitive,
     UnsupportedTypeError,
 )
-from bshark.compiler.loader import BaseLoader
-from bshark.compiler.util import to_qname, get_rpath
+from bshark.compiler.loader2 import BaseLoader
+from bshark.compiler.util import get_declaring_class
 
 
-class Introspector:
+PARCEL_TYPE_NAME = "Parcel"
+PARCEL_QNAME = f"android.os.{PARCEL_TYPE_NAME}"
 
-    def __init__(self, unit: Unit, loader: BaseLoader) -> None:
+
+# --- internal method ---
+def txt(node: Node) -> t.Optional[str]:
+    return node.text.decode() if node else None
+
+
+# ---
+
+
+class Preprocessor:
+    """A preprocessor for AIDL files.
+
+    This simple class can be used to view and inspect basic characteristics
+    of AIDL (and Java) files. The base :class:`Unit` must be loaded first,
+    e.g. by a :class:`BaseLoader`.
+    """
+
+    def __init__(self, unit: Unit) -> None:
         self.unit = unit
-        self.loader = loader
-        self.imports = None
-        if unit.types[0].body is None:
-            raise UnsupportedTypeError(
-                f"Only parcelable or binder with a body are supported (at {self.qname!r})"
-            )
-        # now parse them
-        self.imports = self.get_imports()
+        # some processing must be done before we can compile
+        # the given unit.
+        self.members: t.Dict[str, Node] = self._get_members()
+        self.methods: t.Dict[str, Node] = self._get_methods()
+        self.constructors: t.List[Node] = self._get_constructors()
+
+    @property
+    def lang(self) -> Language:
+        """Returns the language of the unit."""
+        if self.unit.type in (Type.PARCELABLE, Type.BINDER):
+            return AIDL
+        return JAVA
 
     @property
     def qname(self) -> QName:
-        return to_qname(self.unit)
-
-    @property
-    def type(self) -> aidl.tree.TypeDeclaration:
-        return self.unit.types[0]
+        """Returns the qualified name of the unit."""
+        return f"{self.unit.package}.{self.unit.name}"
 
     @property
     def rpath(self) -> RPath:
-        return get_rpath(self.qname)
+        """Returns the relative path of the unit."""
+        path = self.qname.replace(".", "/")
+        if self.unit.type == Type.PARCELABLE_JAVA:
+            return f"{path}.java"
+        if self.is_compiled():
+            return f"{path}.json"
+        return path + FULL_AIDL_EXT
 
     @property
-    def members(self) -> t.List[str]:
-        return list(map(lambda x: x.declarators[0].name, self.type.fields))
+    def declared_class(self) -> t.Optional[Node]:
+        """Returns the body of the unit."""
+        return self.unit.body
 
-    @property
-    def creator(self) -> t.Optional[aidl.tree.MethodDeclaration]:
+    # --- public API methods ---
+
+    def is_compiled(self) -> bool:
+        """Returns whether the unit is already compiled."""
+        return isinstance(self.unit.body, (ParcelableDef, BinderDef))
+
+    def get_creator(self) -> t.Optional[Node]:
         """Resolves the CREATOR field in a parcelable class."""
+        field_decl = self.members.get("CREATOR")
+        if not field_decl:
+            return None
 
-        for field in self.type.fields:
-            if len(field.declarators) != 1:
+        # TODO: find a better way of getting the class body
+        class_body = (
+            field_decl.child_by_field_name("declarator")
+            .child_by_field_name("value")
+            .named_child(2)
+        )
+        methods = get_methods(class_body, self.lang, scope=class_body)
+        return methods.get("createFromParcel")
+
+    def get_parcel_constructor(self) -> t.Optional[Node]:
+        """Resolves the constructor in a parcelable class."""
+        for constructor in self.constructors:
+            parameters = list(get_parameters(constructor, self.lang).values())
+
+            # The constructor MUST have exactly one parameter and this
+            # parameter must be of type Parcel.
+            if len(parameters) != 1:
                 continue
 
-            declarator = field.declarators[0]
-            if declarator.name == "CREATOR":
-                # Now, search for createFromParcel method within the anonymous class
-                for decl in declarator.initializer.body:
-                    if not isinstance(decl, aidl.tree.MethodDeclaration):
-                        continue
+            type_name = parameters[0].child_by_field_name("type")
+            if type_name.text.decode() in (PARCEL_TYPE_NAME, PARCEL_QNAME):
+                return constructor
 
-                    if decl.name == "createFromParcel":
-                        return decl
+        # return nothing instead of throwing an exception as this
+        # is an optional inspection element.
+        return None
 
+    # --- internal helpers ---
+
+    def _get_members(self) -> t.Dict[str, Node]:
+        """Processes all members of the current unit.
+
+        This method will return a dictionary with the field's name
+        mapped to the field's type.
+        """
+        if self.is_compiled():
+            return {}
+
+        body = self.declared_class.child_by_field_name("body")
+        query = self.lang.query(f"({Constants.FIELD_DECL}) @type")
+        return {
+            x.child_by_field_name("declarator")
+            .child_by_field_name("name")
+            .text.decode(): x
+            for x, _ in query.captures(self.unit.body)
+            if x.parent == body
+        }
+
+    def _get_methods(self) -> t.Dict[str, Node]:
+        """Processes all methods of the current unit.
+
+        This method will return a dictionary with the method's name
+        mapped to the method's body.
+        """
+        if self.is_compiled():
+            return {}
+
+        if self.unit.type == Type.BINDER:
+            return get_binder_methods(self.unit.body)
+
+        body = self.declared_class.child_by_field_name("body")
+        return get_methods(self.unit.body, JAVA, scope=body)
+
+    def _get_constructors(self) -> t.List[Node]:
+        """Returns the constructors of the current unit."""
+        if self.is_compiled():
+            return []
+
+        query = self.lang.query(f"({Constants.CONSTUCTOR_DECL}) @type")
+        body = self.declared_class.child_by_field_name("body")
+        return [x for x, _ in query.captures(self.unit.body) if x.parent == body]
+
+
+class TypeHandler:
+    """
+    A special base class to support a mapping of type names to their
+    corresponding Parcel calls.
+    """
+
+    def call_of(self, type_decl: Node, compiler: "Compiler") -> str:
+        """Resolves the corresponding call in the Parcel class of a type name."""
+
+        # 1. Check if there are dimensions associated with the type name
+        array = "Vector" if type_decl.type == "array_type" else ""
+        clean_name = type_decl.text.decode().replace("[]", "")
+
+        # primitive values can be parsed directly
+        if clean_name in Primitive.VALUES:
+            return f"read{clean_name.capitalize()}{array}"
+
+        # 2. Check if the type name is in the list of types
+        # that are special
+        if clean_name in Complex.VALUES:
+            return Complex.VALUES[clean_name] + array
+
+        if type_decl.type == "generic_type":
+            clean_name = type_decl.child(0).text.decode()
+            arguments = type_decl.child(1)
+            match clean_name:
+                case "List":
+                    if arguments.child_count == 0:
+                        return f"readParcelable{array}:java.util.List"
+
+                    ref_ty = arguments.named_child(0).text.decode()
+                    if ref_ty in Complex.VALUES:
+                        return f"readList:{Complex.VALUES[ref_ty]}"
+                    idef = compiler.get_import(ref_ty)
+                    return f"readList:{idef.qname}"
+
+                case _:
+                    raise TypeError(
+                        f"Unsupported generic type {type_decl.text.decode()!r}"
+                    )
+
+        # 3. Check if the type name is in the imports
+        idef = compiler.get_import(clean_name)
+        return f"readParcelable{array}:{idef.qname}"
+
+    def _qname_from_creator_access(self, identifier: str, compiler: "Compiler") -> str:
+        """Resolves the qualified name of a creator field."""
+        target = identifier.split(".")
+        if len(target) == 2:
+            idef = compiler.get_import(target[0])
+            qname = idef.qname
+        else:
+            idef = compiler.get_import(target[0])
+            qname = ".".join([idef.qname] + target[1:-1])
+        return qname
+
+    def call_from_expr(self, expr: Node, tracker: str, compiler: "Compiler") -> str:
+        method = compiler.get_method_call(expr, tracker)
+        if method:
+            # Either the qualifier is the Parcel object (tracker) or
+            # it is defined as an argument.
+            qualifier = txt(method.child_by_field_name("object"))
+            name = txt(method.child_by_field_name("name"))
+            raw_args = method.child_by_field_name("arguments")
+            args = compiler.get_invocation_arguments(raw_args)
+            if qualifier == tracker:
+                # By default we just record the method name
+                match name:
+                    case "readTypedList":
+                        target = args[1]
+                        pass
+
+                    case "readTypedObject":
+                        target = args[0]
+                        return f"readParcelable:{self._qname_from_creator_access(target, compiler)}"
+
+                    case "createTypedArray":
+                        target = args[0]
+                        return f"readList:{self._qname_from_creator_access(target, compiler)}"
+                    case _:
+                        return name
+
+            else:
+                # The object is another CREATOR
+                field = method.child_by_field_name("object")
+                match field.type:
+                    case Constants.FIELD_ACCESS:
+                        target = txt(field.named_child(0))
+                    case Constants.IDENTIFIER:
+                        target = txt(field)
+                idef = compiler.get_import(target)
+                return f"readParcelable:{idef.qname}"
+
+        return "..."
+
+    def const_val_of(self, expr: Node, compiler: "Compiler") -> str:
+        return "..."
+
+
+class NodeVisitor:
+    """A simple visitor class for traversing the AST.
+
+    This class will be responsible for generating :class:`FieldDef` and
+    :class:`ConditionDef` instances.
+    """
+
+    def __init__(self, compiler: "Compiler") -> None:
+        self.compiler = compiler
+
+    def visit(self, node: Node, tracker: str, index: int) -> t.List[FieldDef]:
+        """
+        Traverses the given node and returns a list of :class:`FieldDef`
+        instances (optional).
+        """
+        func = getattr(self, f"visit_{node.type}", None)
+        return func(node, tracker, index) or [] if func else []
+
+    def visit_local_variable_declaration(
+        self, expr: Node, tracker: str, index: int
+    ) -> t.Optional[t.List[FieldDef]]:
+        """Parse a local variable declaration and return a member definition."""
+        if self.compiler.is_local_assignment(expr, tracker):
+            # Local variable: we try to trace the value to the final field
+            local_member = self.compiler.get_local_member(expr)
+            member = self.compiler.trace_local(expr.parent, local_member)
+            call = self.compiler.th.call_from_expr(expr, tracker, self.compiler)
+            return [FieldDef(member, call)]
+
+    def visit_assignment_expression(
+        self, expr: Node, tracker: str, index: int
+    ) -> t.List[FieldDef]:
+        """Parse an assignment statement and return a member definitions."""
+        # The assignment must explicitly contain the tracker
+        if not self.compiler.is_target_assignment(expr, tracker):
+            return []
+
+            # Local variable: we try to trace the value to the final field
+            # # assignment
+            # local_member = self.compiler.get_local_member(expr)
+            # member = self.compiler.trace_local(expr.body, local_member)
+        member = self.compiler.get_assigned_member(expr)
+        # retrieve the target Parcel method call and add
+        # the new member to the list
+        call = self.compiler.th.call_from_expr(expr, tracker, self.compiler)
+        return [FieldDef(member, call)]
+
+    def visit_return_statement(
+        self, expr: Node, tracker: str, index: int
+    ) -> t.Optional[t.List[FieldDef]]:
+        # Return statement with (possible) tracker as argument
+        ctor = expr.named_child(0)
+        if ctor.type != Constants.OBJ_CREATION_EXPR:
+            # end the loop on other return statements
+            raise StopIteration
+
+        args = self.compiler.get_invocation_arguments(
+            ctor.child_by_field_name("arguments")
+        )
+        if tracker in args:
+            # NOTE: we assert here, that the constructor is defined
+            ctor = self.compiler.info.get_parcel_constructor()
+            ctor_tracker = self.compiler.resolve_parcel_tracker(ctor)  #
+            # pylint: disable-next=protected-access
+            return self.compiler._parse_parcelable_java(ctor, ctor_tracker)
+        return None
+
+    def visit_if_statement(
+        self, expr: Node, tracker: str, index: int
+    ) -> t.Optional[t.List[FieldDef]]:
+        # we will trace if statements as they may contain additional
+        # members
+        # NOTE: this implementation will only follow simple IF statements
+        # with a call to the Parcel instance. All other cases can't be
+        # handled (at least not yet)
+        cond: ConditionDef = self.compiler.parse_condition(expr, tracker)
+        if cond:
+            consequence = expr.child_by_field_name("consequence")
+            alternative = expr.child_by_field_name("alternative")
+            # pylint: disable-next=protected-access
+            cond.consequence = self.compiler._parse_parcelable_java(
+                consequence.named_child(0), tracker
+            )
+            if alternative:
+                # pylint: disable-next=protected-access
+                cond.alternative = self.compiler._parse_parcelable_java(
+                    alternative.named_child(0), tracker
+                )
+        return None
+
+    def visit_method_invocation(
+        self, expr: Node, tracker: str, index: int
+    ) -> t.Optional[t.List[FieldDef]]:
+        # If this statement is a delegate, we have to first parse
+        # the invoked method.
+        qualifier = txt(expr.child_by_field_name("object"))
+        if qualifier == tracker:
+            # the statement is a call to the current Parcel
+            # object.
+            call = self.compiler.th.call_from_expr(expr, tracker, self)
+            return [FieldDef(tracker, call)]
+
+        if self.compiler.is_delegate(expr, tracker):
+            # We have two types of delegates:
+            #   1. Delegate parsing to antother parcelable
+            #   2. Delegate parsing to a local method
+            if qualifier is not None:
+                # try to resolve the type of the delegate
+                member_ty = self.compiler.info.members[qualifier].child_by_field_name(
+                    "type"
+                )
+                call = self.compiler.th.call_of(member_ty, self.compiler)
+                return [FieldDef(qualifier, call)]
+
+            method = self.compiler.info.methods.get(
+                txt(expr.child_by_field_name("name"))
+            )
+            if method is not None:
+                method_tracker = self.compiler.resolve_parcel_tracker(method)
+                # pylint: disable-next=protected-access
+                return self.compiler._parse_parcelable_java(method, method_tracker)
+
+
+class Compiler:
+    """
+    The _compiler_ class is used to translate given AIDL definitions into
+    a pre-defined structure that is used by the :class:`Decoder` and
+    :class:`Encoder` classes.
+
+    The internal processing depends on which type the underlying unit was
+    associated with. For instance, :code:`BINDER` declarations will result
+    in a different output than parsed :code:`PARCELABLE_JAVA` declarations.
+
+    In general, the compiler tries to describe what operations need to be
+    performed on a :class:`Unit` in order to decode or encode data. There
+    are predefined methods, which will be mapped to their Python equivalents:
+
+    .. list-table::
+        :header-rows: 1
+        :widths: 20 80
+
+        * - Method
+          - Python Type
+        * - readInt, readLong, readShort, readByte
+          - int
+        * - readBoolean
+          - bool
+        * - readString
+          - str (:code:`utf-16-le` codec)
+        * - readString8
+          - str (:code:`utf-8` codec)
+        * - readFloat, readDouble
+          - float
+
+
+    - Binder: All defined methods will be inspected and their parameters
+      will be translated according to the scheme introduced before.
+
+    :param unit: The unit to compile.
+    :type unit: Unit
+    :param loader: The :class:`BaseLoader` object to use.
+    :type loader: BaseLoader
+    """
+
+    def __init__(
+        self,
+        unit: Unit,
+        loader: BaseLoader,
+        type_handler: t.Optional[TypeHandler] = None,
+        visitor_cls: t.Type[NodeVisitor] = None,
+    ) -> None:
+        self.loader = loader
+        # Calling the preprocessor will load defined members, methods and
+        # constructors of the unit.
+        self.info = Preprocessor(unit)
+        self.th = type_handler or TypeHandler()
+        # internal private fields
+        self._imports = ImportDefList()
+        self._visitor_ty = visitor_cls or NodeVisitor
+
+    @property
+    def unit(self) -> Unit:
+        """Returns the current unit."""
+        return self.info.unit
+
+    @property
+    def resolved_imports(self) -> ImportDefList:
+        """Returns the list of resolved imports."""
+        if len(self._imports) == 0:
+            self._resolve_imports()
+        return self._imports
+
+    def as_binder(self) -> BinderDef:
+        """Returns the given unit as a :class:`BinderDef`."""
+        if self.unit.type != Type.BINDER:
+            raise TypeError(f"{self.unit.type} is not a binder class")
+
+        bdef = BinderDef(self.info.qname, Type.BINDER.name, None)
+        # at first, we have to import all the referenced classes,
+        # because we need to know what type they are.
+        self._resolve_imports()
+        method_defs = set()
+        for i, name in enumerate(self.info.methods, 1):
+            method_decl = self.info.methods[name]
+            rtype = method_decl.child_by_field_name("type")
+            is_oneway = rtype.text == b"void"
+            # NOTE: the method might not be oneway, BUT there may be arguments
+            # with the modifier 'out', which can be decoded as well.
+            # TODO: the transaction code might be different
+            mdef = MethodDef(
+                name=name,
+                tc=i,
+                oneway=is_oneway,
+                retval=None if is_oneway else [],
+                arguments=[],
+            )
+            if not is_oneway:
+                mdef.retval.append(ReturnDef(self.th.call_of(rtype, self)))
+
+            # each parameter may store different modifiers, which will be
+            # expressed by the first unnamed node in the formal parameter
+            # declaration
+            parameters = get_parameters(
+                method_decl, self.info.lang, "binder_formal_parameters"
+            )
+            for param_name, param_decl in parameters.items():
+                # The 'in' modifier is inferred as default modifier
+                param_modifier = get_parameter_modifier(param_decl)
+                param_type = param_decl.child_by_field_name("type")
+                is_out = param_modifier in ("out", "inout")
+                pdef = ParameterDef(
+                    name=param_name,
+                    call=self.th.call_of(param_type, self),
+                    direction=Direction[param_modifier.upper()],
+                )
+                if is_out:
+                    if is_oneway:
+                        mdef.retval = []
+                    mdef.retval.append(pdef)
+
+                if param_modifier in ("in", "inout"):
+                    mdef.arguments.append(pdef)
+            method_defs.add(mdef)
+
+        bdef.methods = list(sorted(method_defs, key=lambda x: x.tc))
+        return bdef
+
+    def as_parcelable(self) -> ParcelableDef:
+        """Returns the given unit as a :class:`ParcelableDef`."""
+        if self.unit.type not in (Type.PARCELABLE, Type.PARCELABLE_JAVA):
+            raise TypeError(f"{self.unit.type} is not a parcelable class")
+
+        pdef = ParcelableDef(self.info.qname, self.unit.type.name, None)
+        self._resolve_imports()
+        if self.unit.type == Type.PARCELABLE_JAVA:
+            # We are using the CREATOR instance as our entry point
+            # and will follow all method calls from there.
+            ctor = self.info.get_parcel_constructor()
+            creator = self.info.get_creator()
+            if not (ctor or creator):
+                raise UnsupportedTypeError(
+                    f"No parcel constructor or creator found - {self.info.qname}"
+                )
+
+            target = creator or ctor
+            tracker = self.resolve_parcel_tracker(target)
+            pdef.fields = self._parse_parcelable_java(target, tracker)
+        return pdef
+
+    # --- internal helpers ---
+    def get_import(self, qname: QName | str) -> ImportDef:
+        """Returns the import with the given qualified name (or tries to import it)."""
+        idef = self._imports.get(qname)
+        if idef is not None:
+            return idef
+
+        try:
+            for unit in self.loader.import_(qname):
+                unit_qname = f"{unit.package}.{unit.name}"
+                idef = ImportDef(qname, unit.type, unit)
+                # import all other units
+                self._imports.append(idef)
+                if unit_qname == qname:
+                    break
+        except (ImportError, FileNotFoundError, ValueError):
+            # try to search for inner classes
+            scope = self.unit.body
+            cls_decl = get_class_by_name(scope, qname, self.info.lang)
+            if cls_decl:
+                idef = ImportDef(
+                    f"{self.info.qname}.{qname}", Type.PARCELABLE_JAVA, cls_decl
+                )
+            else:
+                idef = ImportDef(qname)
+            self._imports.append(idef)
+
+        return idef
+
+    def _resolve_imports(self) -> None:
+        """Resolves all imports of the current unit."""
+        if len(self._imports) > 0:
+            return
+
+        # 1. Import all specified types
+        for imp in self.unit.imports:
+            self.get_import(imp)
+
+        # 2. Import all classes in the current directory
+        decl_qname = get_declaring_class(self.info.qname)
+        package, _ = decl_qname.rsplit(".", 1)
+
+        rel_dir_path = package.replace(".", os.path.sep)
+        abs_dir_path = self.loader.to_absolute(rel_dir_path)
+        for fname in os.listdir(abs_dir_path):
+            name, ext = os.path.splitext(fname)
+            # We will only import AIDL files
+            if ext in (FULL_AIDL_EXT):
+                qname = f"{package}.{name}"
+                self.get_import(qname)
+
+    def resolve_parcel_tracker(self, method: Node) -> str:
+        """Tries to retrieve the parameter name of the parcel argument"""
+        parameters = get_parameters(method, self.info.lang)
+        if len(parameters) < 1:
+            raise ValueError(
+                f"Invalid number of parameters to resolve parcel tracker - got {len(parameters)}"
+            )
+        return next(iter(parameters.keys()))
+
+    # --- parcelable java ---
+    def _parse_parcelable_java(
+        self, method: Node, tracker: str
+    ) -> t.List[FieldDef | ConditionDef]:
+        """
+        Processes the given method declaration and returns a list of
+        all field definitions in the right order.
+        """
+        members = []
+        visitor = self._visitor_ty(self)
+        # We iterate over all statements in the body and look out
+        # for delegations, assignments and local variables. The
+        # 'body' of the method will always contain one child node,
+        # which then stores all the statements.
+        if method.type != Constants.BLOCK:
+            body = method.child_by_field_name("body")
+            if not body:
+                # But if there are no statements in the body, we can
+                # simply return an empty list
+                return members
+
+        for idx, statement in enumerate(body.named_children):
+            if statement.type == Constants.EXPR_STATEMENT:
+                expr = statement.named_child(0)
+            else:
+                expr = statement
+
+            try:
+                members.extend(visitor.visit(expr, tracker, idx))
+            except StopIteration:
+                members.append(Stop())
                 break
 
-        # we don't want to throw an error here, just return None
-        return None
+        return members
 
-    @property
-    def constructor(self) -> t.Optional[aidl.tree.ConstructorDeclaration]:
-        """Resolves the constructor in a parcelable class."""
+    def is_target_assignment(self, expr: Node, tracker: str) -> bool:
+        """Check if an expression is an assignment with the tracker."""
+        if not expr.type == Constants.ASSIGNMENT_EXPR:
+            return False
 
-        # constructor := <class>(Parcel in) { ... }
-        for ctor in self.type.constructors:
-            if len(ctor.parameters) != 1:
-                continue
+        # The left operand must point to a member and the right
+        # must be a method invocation.
+        left = expr.named_child(0)
+        right = self.get_method_call(expr.named_child(1), tracker)
+        if not right:
+            return False
 
-            param = ctor.parameters[0]
-            param_ty = param.type
-            if not getattr(param_ty, "sub_type", None):
-                if param_ty.name == "Parcel":
-                    return ctor
-                continue
+        # TODO: handle cast_expression
+        if right.type != Constants.METHOD_CALL or left.type not in (
+            Constants.FIELD_ACCESS,
+            Constants.IDENTIFIER,
+        ):
+            return False
 
+        # The left operand must point to a member
+        if left.type == Constants.IDENTIFIER:
+            member_name = txt(left)
+            if not member_name in self.info.members:
+                return False
+        else:
+            member_name = txt(left.named_child(1))
             if (
-                param_ty.sub_type
-                and param_ty.sub_type.sub_type
-                and param_ty.sub_type.sub_type.name == "Parcel"
+                left.named_child(0).type != "this"
+                and member_name not in self.info.members
             ):
-                return ctor
+                return False
 
-        # we don't want to throw an error here, just return None
-        return None
-
-    @property
-    def fallback_method(self) -> aidl.tree.MethodDeclaration:
-        """Resolves the fallback method in a parcelable class."""
-
-        # If everything else does not work we have to use this
-        # fallback method
-        return self.get_method("writeToParcel")
-
-    def get_method(self, name: str) -> aidl.tree.MethodDeclaration:
-        """Resolves the fallback method in a parcelable class."""
-
-        # If everything else does not work we have to use this
-        # fallback method
-        for method in self.type.methods:
-            if method.name == name:
-                return method
-        raise ValueError("Could not find fallback method")
-
-    def _method_from_expression(
-        self, expr: aidl.tree.Expression
-    ) -> t.Optional[aidl.tree.MethodInvocation]:
-        value = expr
-        match value:
-            case aidl.tree.MethodInvocation():
-                pass
-            case aidl.tree.Cast():
-                value = value.expression
-            case aidl.tree.BinaryOperation(operandl=aidl.tree.MethodInvocation()):
-                value = value.operandl
-            case aidl.tree.BinaryOperation(operandr=aidl.tree.MethodInvocation()):
-                value = value.operandr
-            case _:
-                return None
-        return value
-
-    def is_assignment(
-        self, expression: aidl.tree.Expression, tracker: t.Optional[str]
-    ) -> bool:
-        """Check if an expression is an assignment."""
-        if not isinstance(expression, aidl.tree.StatementExpression):
-            return False
-
-        if not isinstance(expression.expression, aidl.tree.Assignment):
-            return False
-
-        if not tracker:
+        # the assignment may be a call to another CREATOR, therefore
+        # the qualifier or first parameter can be the value of the
+        # tracker.
+        if txt(right.child_by_field_name("object")) == tracker:
             return True
 
-        # check if the value is a method invocation
-        value = self._method_from_expression(expression.expression.value)
-        if not value:
+        args = self.get_invocation_arguments(right.child_by_field_name("arguments"))
+        return tracker in args
+
+    def get_invocation_arguments(self, invocation: Node) -> t.List[str]:
+        return [x.text.decode() for x in invocation.named_children]
+
+    def get_assigned_member(self, expr: Node) -> str:
+        """
+        Returns the name of the member that is assigned to.
+        """
+        assert expr.type == Constants.ASSIGNMENT_EXPR
+        # The left operand must point to a member
+        left = expr.named_child(0)
+        if left.type == Constants.IDENTIFIER:
+            field_name = txt(left)
+        else:
+            field_name = left.child_by_field_name("field").text.decode()
+        return field_name if field_name in self.info.members else None
+
+    def parse_condition(self, expr: Node, tracker: str) -> t.Optional[ConditionDef]:
+        """Parse an if statement and return a condition definition."""
+        if expr.type != Constants.IF_STATEMENT:
+            return None
+
+        condition = expr.named_child(0)
+        condition_expr = condition.named_child(0)
+        # Currently, only binary expressions are accepted
+        if condition_expr.type != Constants.PARENTHESIZED_EXPR:
+            return None
+
+        binary_expr = condition_expr.named_child(0)
+        if binary_expr.type != Constants.BINARY_EXPR:
+            return None
+
+        left = binary_expr.named_child(0)
+        right = binary_expr.named_child(1)
+        for child in [left, right]:
+            if child.type != Constants.METHOD_CALL:
+                continue
+
+            qualifier = txt(child.child_by_field_name("object"))
+            if qualifier != tracker:
+                continue
+
+            const_val = left if child is right else right
+            name = txt(const_val.child_by_field_name("name"))
+            return ConditionDef(name, self.th.const_val_of(const_val, self), None, None)
+
+        return None
+
+    def is_delegate(self, expr: Node, tracker: str) -> bool:
+        """Check if a method is a delegate to another internal method (not constructor)"""
+        args = self.get_invocation_arguments(expr.child_by_field_name("arguments"))
+        return len(args) == 1 and args[0] == tracker
+
+    def get_method_call(self, expr: Node, tracker: str) -> t.Optional[Node]:
+        """Tries to resolve a method invocation node from the given start node."""
+        query = self.info.lang.query(f"({Constants.METHOD_CALL}) @func")
+        results = query.captures(expr)
+        for invocation, _ in results:
+            if txt(invocation.child_by_field_name("object")) == tracker:
+                return invocation
+
+            raw_args = invocation.child_by_field_name("arguments")
+            if raw_args and tracker in self.get_invocation_arguments(raw_args):
+                return invocation
+
+        return None
+
+    def is_local_assignment(self, expr: Node, tracker: str) -> bool:
+        """Check if an expression is a local assignment with the tracker."""
+        if expr.type != Constants.LOCAL_VAR_DECL:
+            return False
+
+        # The left operand must point to a member and the right
+        # must be a method invocation.
+        declarator = expr.named_child(1)
+        method = self.get_method_call(declarator, tracker)
+        if not method:
             return False
 
         # the assignment may be a call to another CREATOR, therefore
         # the qualifier or first parameter can be the value of the
         # tracker.
-        if value.qualifier == tracker:
+        if txt(method.child_by_field_name("object")) == tracker:
             return True
 
-        if len(value.arguments) < 1:
-            return False
-
-        arg = value.arguments[0]
-        return isinstance(arg, aidl.tree.MemberReference) and arg.member == tracker
-
-    def is_assigned_to_member(self, assignment: aidl.tree.Assignment) -> bool:
-        """Check if an assignment points to a member."""
-        left = assignment.expressionl
-        match left:
-            case aidl.tree.This():
-                # In case where the code defines this.<member> directly,
-                # we will be able to resolve it
-                return True
-
-            case aidl.tree.MemberReference():
-                return left.member in self.members
-
-        # the current statement is not an assignment to a member, but
-        # may encapsulate a local variable to a member
-        return False
-
-    def get_assigned_member(self, assignment: aidl.tree.Assignment) -> str:
-        """Get the name of the member that is being assigned to."""
-        left = assignment.expressionl
-        match left:
-            case aidl.tree.This():
-                # In case where the code defines this.<member> directly,
-                # the selector will give us the member's name
-                return left.selectors[0].member
-
-            case aidl.tree.MemberReference():
-                return left.member
-
-        raise ValueError("Could not get assigned member")
-
-    def is_constructor_delegate(self, method: aidl.tree.MethodDeclaration) -> bool:
-        """Check if a method is a constructor delegate."""
-
-        # CREATOR instances often delegate parsing to the constructor of a
-        # class. In this case, the first element of the body is a method
-        # call to the constructor.
-        if len(method.body) != 1:
-            return False
-
-        body = method.body
-        # The body simply contains:
-        #  return <class>(parcel);
-        if isinstance(body[0], aidl.tree.ReturnStatement):
-            if isinstance(body[0].expression, aidl.tree.ClassCreator):
-                return True
-
-        return False
-
-    def is_delegate(self, incovation: aidl.tree.MethodInvocation, tracker: str) -> bool:
-        """Check if a method is a delegate to another internal method (not constructor)"""
-        if len(incovation.arguments) != 1:
-            return False
-
-        target_arg = incovation.arguments[0]
-        return (
-            isinstance(target_arg, aidl.tree.MemberReference)
-            and target_arg.member == tracker
-        )
-
-    def get_parcel_tracker(self, parameters: t.List[aidl.tree.FormalParameter]) -> str:
-        """Get the name of the parcel tracker."""
-        return parameters[0].name
-
-    def is_local_variable(
-        self, expression: aidl.tree.LocalVariableDeclaration, tracker: str
-    ) -> bool:
-        """Check if an expression is a local variable. and contains the parcel tracker."""
-        if not isinstance(expression, aidl.tree.LocalVariableDeclaration):
-            return False
-
-        declarator = expression.declarators[0]
-        if not isinstance(declarator, aidl.tree.VariableDeclarator):
-            return False
-
-        initializer = declarator.initializer
-        return (
-            isinstance(initializer, aidl.tree.MethodInvocation)
-            and initializer.qualifier == tracker
-        )
-
-    def resolve_parcel_call_from_tracker(
-        self, method: aidl.tree.MethodInvocation
-    ) -> t.Optional[aidl.tree.MethodInvocation]:
-        """Resolve a parcel call from a method invocation on the tracker."""
-        match method.member:
-            case "readTypedList":
-                target = method.arguments[1]
-                if target.member != "CREATOR":
-                    raise ValueError(
-                        f"Expected CREATOR in readTypedList call - got {target.member!r}"
-                    )
-                target_name = target.qualifier
-                return f"readTypedList:{self.imports.get(target_name).qname}"
-
-            case "readTypedObject":
-                ref = method.arguments[0]
-                if ref.member != "CREATOR":
-                    raise ValueError(
-                        f"Expected CREATOR in readTypedObject call - got {ref!r}"
-                    )
-                target_name = ref.qualifier
-                return f"readTypedObject:{self.imports.get(target_name).qname}"
-
-            case _:
-                # By defaulr we just record the method name
-                return method.member
-
-    def get_target_parcel_method(
-        self, method: aidl.tree.MethodInvocation, tracker: str
-    ) -> t.Optional[str]:
-        method = self._method_from_expression(method)
-        if method.qualifier == tracker:
-            # we assert here that the method is an invocation of the tracker
-            # TODO: implement rules
-            return self.resolve_parcel_call_from_tracker(method)
-
-        # qualifier shows us the target class
-        if "CREATOR" in method.qualifier and method.member == "createFromParcel":
-            name, _ = method.qualifier.rsplit(".", 1)
-            # the first part is the target class
-            target_class = self.imports.get(name)
-            if target_class:
-                return f"readParcelable:{target_class.qname}"
-
-        if method.member == "readFromParcel" and method.arguments[0].member == tracker:
-            target_class = method.qualifier
-            return f"readParcelable:{self.imports.get(target_class).qname}"
-
-        # iterate over each argument and check if the qualifier
-        # is the tracker
-        for arg in method.arguments:
-            if isinstance(arg, aidl.tree.MethodInvocation):
-                if arg.qualifier == tracker:
-                    return arg.member
-
-        return None
-
-    def trace_member(
-        self,
-        body: t.List[aidl.tree.StatementExpression],
-        offset: int,
-        assignment: aidl.tree.LocalVariableDeclaration,
-    ) -> t.Tuple[str]:
-        """Tries to trace the name of the member being assigned to.
-
-        This function will inspect all member assignments along the way starting
-        from the given offset in the method body.
-        """
-
-        # Make sure that the assignment is a variable declaration
-        declarator: aidl.tree.VariableDeclarator = assignment.declarators[0]
-        if not isinstance(declarator, aidl.tree.VariableDeclarator):
-            raise TypeError(f"Expected VariableDeclarator, got {type(declarator)}")
-
-        var_name: str = declarator.name
-        if var_name in self.members:
-            return var_name
-
-        for i in range(offset + 1, len(body)):
-            stmt = body[i]
-            # We first check for an assignment statement and then
-            # check if the expression contains the variable name
-            # we are looking for.
-            if self.is_assignment(stmt, tracker=None) and self.is_assigned_to_member(
-                stmt.expression
-            ):
-                member = self.get_assigned_member(stmt.expression)
-                initializer = stmt.expression.value
-                match initializer:
-                    # In case where the temporary variable contains an extra method call,
-                    # we have to ckeck for the qualifier of a method invocation.
-                    case aidl.tree.MethodInvocation():
-                        if initializer.qualifier == var_name:
-                            return member
-
-        # fallback to variable name
-        return var_name
-
-    def is_nullable_check(
-        self, if_statement: aidl.tree.IfStatement, tracker: str
-    ) -> bool:
-        """Checks if the given IF statement is a nullable check."""
-        if not isinstance(if_statement.condition, aidl.tree.BinaryOperation):
-            return False
-
-        left = if_statement.condition.operandl
-        right = if_statement.condition.operandr
-        for x in [left, right]:
-            if isinstance(x, aidl.tree.MethodInvocation):
-                if x.qualifier == tracker:
-                    return True
-        return False
-
-    def get_constant_value(self, statement: aidl.tree.Primary) -> t.Any:
-        match statement:
-            case aidl.tree.Literal():
-                return statement.value
-            case aidl.tree.MemberReference():
-                return statement.member
-
-        raise ValueError(f"Could not get constant value from {statement}")
-
-    def get_nullable_check(
-        self, if_statement: aidl.tree.IfStatement, tracker: str
-    ) -> ConditionDef:
-        left = if_statement.condition.operandl
-        right = if_statement.condition.operandr
-        for x in [left, right]:
-            if isinstance(x, aidl.tree.MethodInvocation):
-                if x.qualifier == tracker:
-                    val = left if x is right else right
-                    return ConditionDef(x.member, self.get_constant_value(val), [])
-        raise ValueError("Could not find nullable check")
-
-    def get_member_type(self, name: str) -> t.Optional[aidl.tree.Type]:
-        for field in self.type.fields:
-            if field.declarators[0].name == name:
-                return field.type
-
-    def _parse_parcelable_java(
-        self, body: t.List[aidl.tree.Statement], tracker: str
-    ) -> t.List[FieldDef | ConditionDef]:
-        members = []
-        # We iterate over all statements in the body and look out
-        # for delegations, assignments and local variables.
-        for j, stmt in enumerate(body):
-            match stmt:
-                # If this statement is a delegate, we have to first parse
-                # the invoked method.
-                case aidl.tree.StatementExpression(
-                    expression=aidl.tree.MethodInvocation()
-                ):
-                    if self.is_delegate(stmt.expression, tracker):
-                        # We have two types of delegates:
-                        #   1. Delegate parsing to antother parcelable
-                        #   2. Delegate parsing to a local method
-                        qualifier = stmt.expression.qualifier
-                        if not qualifier:
-                            # second case
-                            try:
-                                method = self.get_method(stmt.expression.member)
-                            except ValueError:
-                                continue  # method is not within this scope
-                            body = method.body
-                            method_tracker = self.get_parcel_tracker(method.parameters)
-                            members.extend(
-                                self._parse_parcelable_java(body, method_tracker)
-                            )
-                        else:
-                            # try to resolve the type of the delegate
-                            member_ty = self.get_member_type(qualifier)
-                            if not member_ty:
-                                raise ValueError(
-                                    f"Could not resolve type of {qualifier!r}"
-                                )
-                            call = self.get_call(member_ty)
-                            members.append(FieldDef(qualifier, call))
-
-                    elif stmt.expression.qualifier == tracker:
-                        # the statement is a call to the current Parcel
-                        # object.
-                        method = stmt.expression
-                        call = self.resolve_parcel_call_from_tracker(method)
-                        members.append(FieldDef(tracker, call))
-
-                # If this statement is an assignment, we have to check
-                # if it is a member assignment or a local variable
-                case aidl.tree.StatementExpression(expression=aidl.tree.Assignment()):
-                    # The assignment must explicitly contain the tracker
-                    if not self.is_assignment(stmt, tracker):
-                        continue
-
-                    if self.is_assigned_to_member(stmt.expression):
-                        member = self.get_assigned_member(stmt.expression)
-                        func = self.get_target_parcel_method(
-                            stmt.expression.value, tracker
-                        )
-                        members.append(FieldDef(member, func))
-
-                # In case where the statement is a local variable declaration,
-                # we try to trace the name of the member being assigned to.
-                case aidl.tree.LocalVariableDeclaration():
-                    if not self.is_local_variable(stmt, tracker):
-                        continue
-                    func = self.get_target_parcel_method(
-                        stmt.declarators[0].initializer, tracker
-                    )
-                    member = self.trace_member(body, j, stmt)
-                    members.append(FieldDef(member, func))
-
-                # we will trace if statements as they may contain additional members
-                case aidl.tree.IfStatement():
-                    if self.is_nullable_check(stmt, tracker):
-                        cond = self.get_nullable_check(stmt, tracker)
-                        cond.fields += self._parse_parcelable_java(
-                            stmt.then_statement.statements, tracker
-                        )
-                        members.append(cond)
-
-                # Return statement with (possible) tracker as argument
-                case aidl.tree.ReturnStatement(expression=aidl.tree.ClassCreator()):
-                    ctor = stmt.expression
-                    if len(ctor.arguments) == 1 and ctor.arguments[0].member == tracker:
-                        ctor = self.constructor
-                        members += self._parse_parcelable_java(ctor.body, tracker)
-
-                case aidl.tree.ReturnStatement():
-                    # end the loop on other return statements
-                    members.append(Stop())
-                    break
-
-        return members
-
-    def parcelable_java(
-        self, method: aidl.tree.MethodDeclaration
-    ) -> t.List[FieldDef | ConditionDef]:
-        """
-        Processes the given method declaration and returns a dictionary
-        of internal members and their corresponding parcel methods.
-        """
-        if self.loader.ccache[self.qname] != Type.PARCELABLE_JAVA:
-            raise ValueError("Not a parcelable java class")
-
-        tracker = self.get_parcel_tracker(method.parameters)
-        body = method.body
-        return self._parse_parcelable_java(body, tracker)
-
-    def parcelable(self) -> t.List[FieldDef | ConditionDef]:
-        """Process this class and return all fields."""
-        members = []
-        if self.type.cpp_header:
-            raise UnsupportedTypeError("CPP header files are not supported")
-
-        for field in self.type.fields:
-            if "static" in field.modifiers:
-                continue
-            # We are processing ConstantDeclaration objects, which usually
-            # store the VariableDeclarator and its type.
-            declarator = field.declarators[0]
-            members.append(FieldDef(declarator.name, self.get_call(field.type)))
-        return members
-
-    def get_full_type(self, ref_ty: aidl.tree.ReferenceType) -> aidl.tree.ReferenceType:
-        parts = [ref_ty.name]
-        current = ref_ty.sub_type
-        while current:
-            parts.append(current.name)
-            current = current.sub_type
-        return aidl.tree.Type(name=".".join(parts))
-
-    def get_call(self, ty: aidl.tree.Type) -> t.Optional[str]:
-        # If the parameter is an imported type we have to
-        # check its inferred type (binder, parcelable, etc)
-        array = "Vector" if len(ty.dimensions or []) != 0 else ""
-        if ty.name in Primitive.VALUES:
-            return f"read{ty.name.capitalize()}{array}"
-
-        if ty.name in Complex.VALUES:
-            return Complex.VALUES[ty.name] + array
-
-        # fallback classes
-        match ty.name:
-            case "List" | "java.util.List":
-                if not ty.arguments:
-                    # No type arguments -> return fallback instead
-                    return f"readParcelable{array}:java.util.List"
-
-                ref_ty = self.get_full_type(ty.arguments[0].type)
-                if ref_ty.name in self.imports:
-                    return f"readList:{self.imports.get(ref_ty.name).qname}"
-                if ref_ty.name in Complex.VALUES:
-                    return f"readList:{Complex.VALUES[ref_ty.name]}"
-
-                return f"readList:{ref_ty.name}"
-
-        if ty.name in self.imports:
-            item = self.imports.get(ty.name)
-            if item and item.file_type == Type.BINDER:
-                return f"readStrongBinder{array}"
-            # We assert all other types are parcelable classes,
-            # even if we can't import them.
-            return f"readParcelable{array}:{item.qname}"
-
-        if isinstance(ty, aidl.tree.ReferenceType) and ty.sub_type:
-            parts = [ty.name]
-            current = ty.sub_type
-            while current:
-                parts.append(current.name)
-                current = current.sub_type
-            return self.get_call(aidl.tree.Type(name=".".join(parts)))
-
-        # last fallback option: current directory
-        cname = ty.name
-        rel_dir_path = ty.name.replace(".", "/")
-        match ty.name.count("."):
-            case 1:  # inner class in the current package
-                cname, _ = ty.name.split(".")
-                qname = f"{self.unit.package.name}.{ty.name}"
-                rel_dir_path = os.path.sep.join(qname.split(".")[:-2])
-            case 0:  # class in the current package
-                cname = ty.name
-                qname = f"{self.unit.package.name}.{ty.name}"
-                rel_dir_path = os.path.sep.join(qname.split(".")[:-1])
-            case _:
-                parts = ty.name.split(".")
-                qname = ty.name
-                if parts[-2][0].isupper():
-                    # inner class in another package
-                    cname = parts[-2]
-                    rel_dir_path = "/".join(parts[:-2])
-                else:
-                    cname = parts[-1]
-                    rel_dir_path = "/".join(parts[:-1])
-
-        try:
-            abs_dir_path = self.loader.to_absolute(rel_dir_path)
-        except FileNotFoundError:
-            # TODO: fix
-            return f"readParcelable{array}:{qname}"
-
-        for fname in os.listdir(abs_dir_path):
-            # check without extension
-            name, extension = os.path.splitext(fname)
-            if name == cname:
-                unit_type = None
-                if qname in self.loader.ccache:
-                    unit_type = self.loader.ccache[qname]
-
-                elif extension == "aidl":
-                    self.loader.import_(qname)
-                    unit_type = self.loader.ccache[qname]
-
-                return (
-                    f"readParcelable{array}:{qname}"
-                    if unit_type != Type.BINDER
-                    else f"readStrongBinder{array}"
-                )
-
-    def _perform_import(self, qname: str) -> t.List[ImportDef]:
-        try:
-            imported_units = self.loader.import_(qname)
-        except (ImportError, FileNotFoundError):
-            return [ImportDef(qname)]
-
-        result = []
-        for imported_unit in (
-            imported_units if isinstance(imported_units, list) else [imported_units]
-        ):
-            qname = to_qname(imported_unit)
-            def_type = Type.PARCELABLE
-            if qname in self.loader.ccache:
-                def_type = self.loader.ccache[qname]
-
-            result.append(
-                ImportDef(
-                    qname,
-                    def_type,
-                    imported_unit,
-                )
-            )
-        return result
-
-    def get_imports(self) -> ImportDefList:
-        """Resolves the imports in the underlying class."""
-        if self.imports is not None:
-            return self.imports
-
-        imports = ImportDefList()
-        for import_decl in self.unit.imports:
-            if import_decl.static:
-                continue
-            imports.extend(self._perform_import(import_decl.path))
-
-        # fallback: import all files from the current directory
-        parts = self.unit.package.name.split(".")
-        if parts[-1][0].isupper():
-            parts = parts[:-1]
-
-        rel_dir_path = os.path.sep.join(parts)
-        abs_dir_path = self.loader.to_absolute(rel_dir_path)
-        for fname in os.listdir(abs_dir_path):
-            name, ext = os.path.splitext(fname)
-            if ext in (FULL_AIDL_EXT, ".java", ".json"):
-                qname = ".".join(parts + [name])
-                imports.extend(self._perform_import(qname))
-
-        return imports
-
-    def as_binder(self) -> BinderDef:
-        """
-        Processes the given method declarations and returns a dictionary
-        of internal members and their corresponding parcelable calls
-        """
-        if self.loader.ccache[self.qname] != Type.BINDER:
-            raise ValueError("Not a binder class")
-
-        bdef = BinderDef(self.qname, Type.BINDER.name, None)
-        # at first, we have to import all the referenced classes
-        members = set()
-        for method in self.type.methods:
-            item = MethodDef(
-                method.name,
-                method.code,
-                arguments=[],
-                retval=(None if not method.return_type else []),
-            )
-            is_oneway = item.retval is None
-
-            if not is_oneway:
-                item.retval.append(ReturnDef(self.get_call(method.return_type)))
-
-            for parameter in method.parameters:
-                param_ty = parameter.type
-                param_def = ParameterDef(parameter.name, self.get_call(param_ty))
-                if "out" in parameter.modifiers:
-                    # TODO: explain
-                    if is_oneway:
-                        item.retval = []
-                    #     raise ValueError(
-                    #         f"Oneway method ({item.name}) cannot have 'out' parameters in class {bdef.qname}"
-                    #     )
-                    item.retval.append(param_def)
-                    param_def.direction = Direction.OUT
-                else:
-                    item.arguments.append(param_def)
-
-            members.add(item)
-
-        bdef.methods = list(sorted(members, key=lambda x: x.tc))
-        return bdef
-
-    def as_parcelable(self) -> ParcelableDef:
-        """
-        Processes the given unit as a parcelable class and returns a dictionary
-        of internal members and their corresponding parcelable calls
-        """
-        ty = self.loader.ccache[self.qname]
-        if ty not in (
-            Type.PARCELABLE,
-            Type.PARCELABLE_JAVA,
-        ):
-            raise ValueError(f"Not a parcelable class - got {ty}")
-
-        pdef = ParcelableDef(self.qname, ty.name, None)
-        if ty == Type.PARCELABLE:
-            pdef.fields = self.parcelable()
-        else:
-            # We are using the CREATOR instance as our entry point
-            # and will follow all method calls from there.
-            ctor = self.constructor
-            creator = self.creator
-            if not ctor and not creator:
-                raise UnsupportedTypeError(
-                    f"Class {self.qname} is not a parcelable class"
-                )
-            if self.is_constructor_delegate(creator) and ctor:
-                # Just use the constructor directly
-                target = ctor
-            elif creator:
-                target = creator
-
-            pdef.fields = self.parcelable_java(target)
-        return pdef
+        args = self.get_invocation_arguments(method.child_by_field_name("arguments"))
+        return tracker in args
+
+    def get_local_member(self, expr: Node) -> t.Optional[str]:
+        """Returns the name of the member that is assigned to."""
+        if expr.type != Constants.LOCAL_VAR_DECL:
+            return None
+
+        return txt(expr.named_child(1).named_child(0))
+
+    def trace_local(self, body: Node, tracker: str) -> str:
+        query = self.info.lang.query(f"({Constants.ASSIGNMENT_EXPR}) @assignment")
+        query2 = self.info.lang.query(f"({Constants.IDENTIFIER}) @field")
+        results = query.captures(body)
+        for assignment, _ in results:
+            for identifier, _ in query2.captures(assignment.named_child(1)):
+                if txt(identifier) == tracker:
+                    field = assignment.named_child(0)
+                    if field.type == Constants.FIELD_ACCESS:
+                        return txt(field.child_by_field_name("field"))
+                    return txt(field)
+
+        return tracker

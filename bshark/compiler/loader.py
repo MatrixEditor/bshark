@@ -1,13 +1,23 @@
 import os
 import json
-import aidl
 import typing as t
 
-from bshark.compiler.model import Unit, QName, RPath, Type
-from bshark.compiler.model import ABSPath, from_json
-from bshark.compiler.util import is_parcelable_unit, get_qname, to_qname
-from bshark.compiler.util import filteraidl, filterclasses, filtertypes
-from bshark.compiler.util import get_declaring_class, get_class_name
+from tree_sitter import Node
+
+
+from bshark.aidl import (
+    JAVA,
+    AIDL,
+    parse_java,
+    parse_aidl,
+    get_package,
+    get_imports,
+    get_class_by_name,
+    Unit,
+    Type,
+)
+from bshark.compiler.util import get_qname, filteraidl
+from bshark.compiler.model import QName, RPath, ABSPath, Type, from_json
 
 
 class BaseLoader:
@@ -16,7 +26,6 @@ class BaseLoader:
         self,
         path: t.List[str],
         uc: t.Optional[dict] = None,
-        cc: t.Optional[dict] = None,
     ):
         """
         Initializes the loader.
@@ -36,95 +45,40 @@ class BaseLoader:
 
         self.search_path = path
         self.ucache: dict[QName, Unit] = uc or {}
-        self.ccache: dict[QName, Type] = cc or {}
 
-    def parse_java(self, abs_path: str, qname: t.Optional[str] = None) -> t.List[Unit]:
-        """Parses the given java file and stores all parcelable units."""
-        with open(abs_path, "r", encoding="utf-8") as f:
-            try:
-                unit = aidl.fromstring(f.read(), is_aidl=False)
-            except aidl.JavaSyntaxError as err:
-                raise SyntaxError(f"{abs_path} is not a valid java file") from err
+    def parse_java(
+        self, abs_path: str, name: str, parent: t.Optional[str] = None
+    ) -> Unit:
+        """Parses the given java file and searches for the given class"""
+        with open(abs_path, "rb") as f:
+            unit = parse_java(f.read())
 
-        result = []
-        # pylint: disable-next=no-member
-        for defined_type in unit.types:
-            # NOTE: we have to use the package here instead of the qname
-            result.extend(
-                # pylint: disable-next=no-member
-                self._load_inner_classes(defined_type, unit.package.name, unit.imports)
-            )
+        if "." in name:
+            parts = name.split(".")
+            name = parts[-1]
+            parent = ".".join([parent] + parts[:-1])
 
-        # Sometimes, the class does not directly implement the Parcelable
-        # interface, so we have to add the type manually
-        if qname and qname not in self.ucache:
-            unit_qname = to_qname(unit)
-            if unit_qname == qname:
-                self.ucache[qname] = unit
-                self.ccache[qname] = Type.PARCELABLE_JAVA
-            else:
-                self._add_exact_class(
-                    unit.types[0], to_qname(unit), qname, unit.imports
-                )
-                if qname not in self.ucache:
-                    # This should never happen, but we will add a phantom unit,
-                    # which stores only the class name
-                    package = get_declaring_class(qname)
-                    self.ucache[qname] = Unit(
-                        package=aidl.tree.PackageDeclaration(name=package),
-                        imports=unit.imports,
-                        types=[aidl.tree.TypeDeclaration(name=get_class_name(qname))],
-                    )
-                    self.ccache[qname] = Type.PARCELABLE_JAVA
+        class_decl = get_class_by_name(unit.root_node, name, JAVA)
+        if not class_decl:
+            raise ValueError(f"Could not find class {name!r} in {abs_path}")
 
-            result.append(self.ucache[qname])
-        return result
-
-    def _add_exact_class(
-        self, unit: aidl.tree.TypeDeclaration, package: str, qname: str, imports
-    ) -> None:
-        for ty in filterclasses(unit.body):
-            ty_qname = f"{package}.{ty.name}"
-            if ty_qname == qname:
-                self.ccache[qname] = Type.PARCELABLE_JAVA
-                self.ucache[qname] = Unit(
-                    package=aidl.tree.PackageDeclaration(name=package),
-                    imports=imports,
-                    types=[ty],
-                )
-                break
-            self._add_exact_class(ty, package, qname, imports)
-
-    def _load_inner_classes(
-        self, base_unit: aidl.tree.TypeDeclaration, base_qname: str, imports
-    ) -> t.List[Unit]:
-        """
-        Loads the inner classes of the given base unit (only for parcelable units).
-        """
-        units = []
-        qname = f"{base_qname}.{base_unit.name}"
-        if is_parcelable_unit(base_unit):
-            u = aidl.tree.CompilationUnit(
-                package=aidl.tree.PackageDeclaration(name=base_qname),
-                imports=imports,
-                types=[base_unit],
-            )
-            self.ccache[qname] = Type.PARCELABLE_JAVA
-            self.ucache[qname] = u
-            units.append(u)
-
-        for ty in filterclasses(base_unit):
-            units += self._load_inner_classes(ty, qname, imports)
-        return units
+        # Package must be queried from the root node
+        package = get_package(unit.root_node, JAVA)
+        imports = get_imports(unit.root_node, JAVA)
+        qname = f"{package}.{name}" if not parent else f"{package}.{parent}.{name}"
+        self.ucache[qname] = Unit(
+            package,
+            imports,
+            name,
+            Type.PARCELABLE_JAVA,
+            class_decl,
+        )
+        return self.ucache[qname]
 
     def parse_aidl(self, abs_path: ABSPath) -> Unit:
         """Parses the given aidl file and returns the parsed unit without caching it."""
-        with open(abs_path, "r", encoding="utf-8") as f:
-            try:
-                unit = aidl.fromstring(f.read(), is_aidl=True)
-            except aidl.JavaSyntaxError as err:
-                raise SyntaxError(f"{abs_path} is not a valid AIDL file") from err
-        return unit
+        with open(abs_path, "rb") as fp:
+            return parse_aidl(fp.read())
 
     def parse_json(self, abs_path: ABSPath) -> Unit:
         """Parses the given json file and returns the cached unit"""
@@ -137,12 +91,7 @@ class BaseLoader:
         parts = qname.split(".")
         classes = len(list(filter(lambda x: x[0].isupper(), parts)))
         package = ".".join(parts[:-classes])
-        unit = aidl.tree.CompilationUnit(
-            package=aidl.tree.PackageDeclaration(name=package),
-            types=[definition],
-            imports=[],
-        )
-        self.ccache[qname] = definition.type
+        unit = Unit(package, [], parts[-1], definition.type, definition)
         self.ucache[qname] = unit
         return unit
 
@@ -158,52 +107,52 @@ class BaseLoader:
         )
 
     def _process_aidl_unit(
-        self, body, base_package: str, imports, aidl_rpath: RPath
+        self, body: Node, base_package: str, imports, aidl_rpath: RPath
     ) -> t.List[Unit]:
         """Processes an aidl unit and returns the cached units."""
         types = []
-        for defined_type in filtertypes(body):
+        query = AIDL.query(
+            """
+            (parcelable_declaration) @type
+            (interface_declaration) @type
+            """
+        )
+        for defined_type, _ in query.captures(body):
             # the qualified name may contain '$' to indicate that we
             # have a reference to an inner class.
-            raw_qname = f"{base_package}.{defined_type.name}"
-            qname = raw_qname.replace("$", ".")
+            name = defined_type.child_by_field_name("name").text.decode()
+            qname = f"{base_package}.{name}"
 
             # Use cached units whenever possible
             if qname in self.ucache:
                 types.append(self.ucache[qname])
                 continue
 
+            unit_ty = None
             # We have to types of declarations
-            match defined_type:
+            match defined_type.type:
                 # 1. An interface defines a service, which will be
                 # translated into a binder.
-                case aidl.tree.InterfaceDeclaration():
-                    self.ccache[qname] = Type.BINDER
+                case "interface_declaration":
+                    unit_ty = Type.BINDER
 
                 # 2. An direct parcelable class to import
-                case aidl.tree.ParcelableDeclaration():
-                    self.ccache[qname] = Type.PARCELABLE
-                    if not defined_type.body:
+                case "parcelable_declaration":
+                    unit_ty = Type.PARCELABLE
+                    if not defined_type.child_by_field_name("body"):
                         # Parcelable definitions may not store a body and
                         # therefore can be a reference to an existing Java
                         # class.
-                        self.ccache[qname] = Type.PARCELABLE_JAVA
-                        # Now, we try to resolve the Java equivalent
                         java_rel_path = aidl_rpath.replace(".aidl", ".java")
                         java_abs_path = self.to_absolute(java_rel_path)
                         # Actually, we do not need to inspect the result here,
                         # because the method already stores the required unit.
-                        self.parse_java(java_abs_path, qname)
-                        types.append(self.ucache[qname])
+                        types.append(self.parse_java(java_abs_path, name, base_package))
                         continue
 
             # create the new type
-            if qname in self.ccache:
-                unit = aidl.tree.CompilationUnit(
-                    package=aidl.tree.PackageDeclaration(name=base_package),
-                    imports=imports,
-                    types=[defined_type],
-                )
+            if unit_ty:
+                unit = Unit(base_package, imports, name, unit_ty, defined_type)
                 self.ucache[qname] = unit
                 types.append(unit)
 
@@ -225,13 +174,15 @@ class BaseLoader:
 
         abs_path = self.to_absolute(rpath)
         unit = self.parse_aidl(abs_path)
+
+        imports = get_imports(unit.root_node, AIDL)
+        package = get_package(unit.root_node, AIDL)
         # We have to collect all classes, event if they are marked
         # as inner classes in the aidl file.
         result = self._process_aidl_unit(
-            # pylint: disable-next=no-member
-            unit.types,
-            unit.package.name,
-            unit.imports,
+            unit.root_node,
+            package,
+            imports,
             rpath,
         )
         return tuple(result)
@@ -259,7 +210,9 @@ class BaseLoader:
             return list(self.load_aidl(rpath))
 
         if rpath.endswith(".java"):
-            return list(self.parse_java(self.to_absolute(rpath)))
+            qname = get_qname(rpath)
+            package, name = qname.rsplit(".", 1)
+            return [self.parse_java(self.to_absolute(rpath), name, package)]
 
         if rpath.endswith(".json"):
             return [self.parse_json(self.to_absolute(rpath))]
@@ -283,6 +236,15 @@ class BaseLoader:
 
         for ext in (".aidl", ".java", ".json"):
             full_rpath = f"{rel_path}{ext}"
-            abs_path = self.to_absolute(full_rpath)
-            if os.path.exists(abs_path):
+            try:
+                self.to_absolute(full_rpath)
                 return self._import_one(full_rpath)
+            except FileNotFoundError:
+                pass
+
+        raise ImportError(
+            (
+                "The referenced class could not be resolved using .aidl, .java and "
+                f".json imports. (referenced class: {qname!r})"
+            )
+        )

@@ -963,6 +963,7 @@ module.exports = grammar({
       $.interface_declaration,
       $.annotation_type_declaration,
       $.enum_declaration,
+      $.parcelable_declaration,
       $.block,
       $.static_initializer,
       $.constructor_declaration,
@@ -1078,6 +1079,7 @@ module.exports = grammar({
 
     interface_declaration: $ => seq(
       optional($.modifiers),
+      optional(field('oneway', 'oneway')),
       'interface',
       field('name', $.identifier),
       field('type_parameters', optional($.type_parameters)),
@@ -1099,6 +1101,7 @@ module.exports = grammar({
         $.binder_method_declaration,
         $.class_declaration,
         $.interface_declaration,
+        $.parcelable_declaration,
         $.record_declaration,
         $.annotation_type_declaration,
         ';',
@@ -1223,17 +1226,45 @@ module.exports = grammar({
         repeat($._annotation),
       )),
       field('type', $._unannotated_type),
-      $._method_declarator,
+      $._binder_method_declarator,
       optional($.throws),
     ),
 
-    _binder_modifiers: $ => choice('in', 'out', 'inout'),
-
     _binder_method_declarator: $ => seq(
-      field('modifiers', optional($._binder_modifiers)),
       field('name', choice($.identifier, $._reserved_identifier)),
-      field('parameters', $.formal_parameters),
+      field('parameters', $.binder_formal_parameters),
       field('dimensions', optional($.dimensions)),
+    ),
+
+    binder_formal_parameters: $ => seq(
+      '(',
+      choice(
+        $.binder_receiver_parameter,
+        seq(
+          optional(seq($.receiver_parameter, ',')),
+          commaSep(choice($.binder_formal_parameter, $.spread_parameter)),
+        ),
+      ),
+      ')',
+    ),
+
+    binder_receiver_parameter: $ => seq(
+      $._binder_direction,
+      repeat($._annotation),
+      $._unannotated_type,
+      repeat(seq($.identifier, '.')),
+      $.this,
+    ),
+
+    _binder_direction: $ => seq(
+      field('direction', choice('in', 'out', 'inout')),
+    ),
+
+    binder_formal_parameter: $ => seq(
+      optional($._binder_direction),
+      optional($.modifiers),
+      field('type', $._unannotated_type),
+      $._variable_declarator_id,
     ),
 
     _method_declarator: $ => seq(

@@ -1,10 +1,9 @@
-import aidl
 import typing as t
 import dataclasses as dc
 import enum
 import json
 
-from bshark import FULL_AIDL_EXT
+from bshark.aidl import Type, Unit
 
 QName = str
 """Qualified class name.
@@ -31,31 +30,9 @@ This is a string of the form `package.ClassName` with an optional wildcard
 to import everything.
 """
 
-Unit = aidl.tree.CompilationUnit
-"""A parsed source code unit.
-
-Instances of this class include AIDL classes as well as Java classes.
-"""
-
 
 class UnsupportedTypeError(TypeError):
     """A special exception used to mark unsupported types."""
-
-
-class Type(enum.Enum):
-    """The type of a unit."""
-
-    PARCELABLE = 0
-    """A parcelable class (directly from an AIDL file)."""
-
-    PARCELABLE_JAVA = 1
-    """A parcelable class, which was loaded from a Java file."""
-
-    BINDER = 2  # conforms to an interface
-    """An interface definition (binder) from an AIDL file."""
-
-    SPECIAL = 3  # unused
-    UNDEFINED = 4  # unused
 
 
 class Primitive:
@@ -150,11 +127,9 @@ class MethodDef:
 
     name: str
     tc: int
+    oneway: bool
     retval: t.Optional[t.List[ParameterDef | ReturnDef]]
     arguments: t.List[ParameterDef]
-
-    def is_oneway(self) -> bool:
-        return self.retval is None
 
     def __hash__(self):
         return hash(self.name)
@@ -194,15 +169,16 @@ class ConditionDef:
 
     call: str
     check: str
-    fields: t.List[FieldDef]
+    consequence: t.List[FieldDef]
+    alternative: t.List[FieldDef]
 
 
 @dc.dataclass(slots=True)
 class ClassDef:
     """A simple generic type definition."""
 
-    qname: str
-    type: Type
+    qname: QName
+    type: Type | str
 
 
 @dc.dataclass(slots=True)
@@ -232,9 +208,12 @@ class Stop:
 class ImportDefList(list):
     """Internal class to store import definitions."""
 
-    def get(self, name: str) -> t.Optional[ImportDef]:
+    def get(self, name: QName) -> t.Optional[ImportDef]:
         """Returns the import definition with the given name."""
-        return next(filter(lambda x: x.name == name, self), None)
+        for i in self:
+            if i.name == name or (i.unit and i.unit.name == name):
+                return i
+        return None
 
 
 # --- JSON conversion ---
@@ -273,7 +252,7 @@ def from_json(json_str: str | dict) -> BinderDef | ParcelableDef:
 def _load_binder_from_json(doc: t.Dict[str, t.Any]) -> BinderDef:
     bdef = BinderDef(doc["qname"], Type.BINDER, [])
     for method in doc["methods"]:
-        mdef = MethodDef(method["name"], method["tc"], None, [])
+        mdef = MethodDef(method["name"], method["tc"], method["oneway"], None, [])
         if method["retval"]:
             for rval in method["retval"]:
                 mdef.retval = []
@@ -297,9 +276,18 @@ def _load_field_from_json(doc: t.Dict[str, t.Any]) -> FieldDef | ConditionDef:
         return Stop()
 
     if "check" in doc:
-        cdef = ConditionDef(doc["call"], doc["check"], [])
-        for field in doc["fields"]:
-            cdef.fields.append(_load_field_from_json(field))
+        cdef = ConditionDef(doc["call"], doc["check"], None, None)
+        consequence = doc["consequence"]
+        if consequence:
+            cdef.consequence = []
+            for field in consequence:
+                cdef.consequence.append(_load_field_from_json(field))
+
+        alternative = doc["alternative"]
+        if alternative:
+            cdef.alternative = []
+            for field in alternative:
+                cdef.alternative.append(_load_field_from_json(field))
         return cdef
 
     return FieldDef(doc["name"], doc["call"])

@@ -7,3 +7,5 @@ FULL_AIDL_EXT = f".{AIDL_EXT}"
 """
 Full file extension name for Android Interface Definition Language (AIDL).
 """
+
+from . import compiler
