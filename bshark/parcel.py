@@ -20,11 +20,13 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 import enum
+import typing as t
 
-from caterpillar.shortcuts import struct, LittleEndian, ctx
+from caterpillar.shortcuts import struct, LittleEndian, ctx, unpack
 from caterpillar.fields import uint32, Memory, Enum, singleton, String, Computed
 
 from bshark.parser import Parser
+from bshark.compiler import BaseLoader
 from bshark.compiler.model import Direction
 
 
@@ -88,3 +90,38 @@ class OutgoingMessage:
     data: Memory(...) >> parse_outgoing_message
 
 
+def parse(
+    data: memoryview,
+    code: int,
+    loader: BaseLoader,
+    version: int,
+    descriptor: t.Optional[str] = None,
+    in_: bool = True,
+) -> IncomingMessage | OutgoingMessage:
+    """
+    Parses an incoming or outgoing message based on the given parameters.
+
+    :param data: the received transaction data
+    :type data: memoryview
+    :param code: the transaction code
+    :type code: int
+    :param loader: the loader instance
+    :type loader: BaseLoader
+    :param version: the configured android version
+    :type version: int
+    :param descriptor: an optional interface descriptor, defaults to None,
+                       required for outgoing messages
+    :type descriptor: t.Optional[str], optional
+    :param in_: whether the message is incoming, defaults to True
+    :type in_: bool, optional
+    :return: the parsed message
+    :rtype: IncomingMessage | OutgoingMessage
+    """
+    return unpack(
+        IncomingMessage if in_ else OutgoingMessage,
+        data,
+        code=code,
+        loader=loader,
+        android_version=version,
+        interface=descriptor,
+    )

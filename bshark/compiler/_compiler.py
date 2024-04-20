@@ -538,6 +538,21 @@ class Compiler:
             self._resolve_imports()
         return self._imports
 
+    def compile(self) -> BinderDef | ParcelableDef:
+        """Compiles the stored unit. (if possible)"""
+        definition = None
+        match self.unit.type:
+            case Type.PARCELABLE_JAVA:
+                definition = self.as_parcelable()
+            case Type.BINDER:
+                definition = self.as_binder()
+            case _:
+                raise TypeError(f"{self.unit.type} is not a supported type")
+
+        self.loader.ucache[self.info.qname] = definition
+        return definition
+
+
     def as_binder(self) -> BinderDef:
         """Returns the given unit as a :class:`BinderDef`."""
         if self.unit.type != Type.BINDER:
@@ -591,6 +606,7 @@ class Compiler:
             method_defs.add(mdef)
 
         bdef.methods = list(sorted(method_defs, key=lambda x: x.tc))
+        self.loader.ucache[self.info.qname].body = bdef
         return bdef
 
     def as_parcelable(self) -> ParcelableDef:

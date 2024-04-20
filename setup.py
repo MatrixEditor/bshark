@@ -4,7 +4,7 @@ from setuptools import Extension, setup
 setup(
     name="bshark",
     packages=["bshark"],
-    requires=[
+    install_requires=[
         "tree-sitter",
         "rich",
         "caterpillar@git+https://github.com/MatrixEditor/caterpillar.git",
