@@ -1,0 +1,831 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Compiler Implementation &#8212; bshark 0.1-beta documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+  
+  <link href="../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script src="../_static/documentation_options.js?v=91ca89c4"></script>
+    <script src="../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/design-tabs.js?v=36754332"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'api/compiler';</script>
+    <link rel="icon" href="../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Compiler Utilities" href="compilerutilities.html" />
+    <link rel="prev" title="Loader API" href="loader.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+
+<a class="navbar-brand logo" href="../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../_static/favicon.ico" class="logo__image only-light" alt=""/>
+    <script>document.write(`<img src="../_static/favicon.ico" class="logo__image only-dark" alt=""/>`);</script>
+  
+  
+    <p class="title logo__title">bshark</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../cmd.html">
+                        CLI Reference and Usage
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="index.html">
+                        Library Internals
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/MatrixEditor/bshark" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+    <label class="sidebar-toggle secondary-toggle" for="__secondary" tabindex="0">
+      <span class="fa-solid fa-outdent"></span>
+    </label>
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+      <div class="bd-sidebar-primary bd-sidebar">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../cmd.html">
+                        CLI Reference and Usage
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item current active">
+                      <a class="nav-link nav-internal" href="index.html">
+                        Library Internals
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/MatrixEditor/bshark" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+      </div>
+    
+  </div>
+  
+    <div class="sidebar-primary-items__start sidebar-primary__section">
+        <div class="sidebar-primary-item">
+<nav class="bd-docs-nav bd-links"
+     aria-label="Section Navigation">
+  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
+  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Basic API</span></p>
+<ul class="nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="aidl.html">AIDL Utilities</a></li>
+</ul>
+<p aria-level="2" class="caption" role="heading"><span class="caption-text">Compiler API</span></p>
+<ul class="current nav bd-sidenav">
+<li class="toctree-l1"><a class="reference internal" href="compilermodel.html">Model Classes and API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="loader.html">Loader API</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Compiler Implementation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compilerutilities.html">Compiler Utilities</a></li>
+</ul>
+</div>
+</nav></div>
+    </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="index.html" class="nav-link">Library Internals</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">Compiler...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <section id="module-bshark.compiler">
+<span id="compiler-implementation"></span><span id="api-compiler"></span><h1>Compiler Implementation<a class="headerlink" href="#module-bshark.compiler" title="Link to this heading">#</a></h1>
+<section id="preprocessing">
+<h2>Preprocessing<a class="headerlink" href="#preprocessing" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="bshark.compiler._compiler.Preprocessor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">bshark.compiler._compiler.</span></span><span class="sig-name descname"><span class="pre">Preprocessor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="aidl.html#bshark.aidl.Unit" title="bshark.aidl.Unit"><span class="pre">Unit</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bshark/compiler/_compiler.html#Preprocessor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bshark.compiler._compiler.Preprocessor" title="Link to this definition">#</a></dt>
+<dd><p>A preprocessor for AIDL files.</p>
+<p>This simple class can be used to view and inspect basic characteristics
+of AIDL (and Java) files. The base <code class="xref py py-class docutils literal notranslate"><span class="pre">Unit</span></code> must be loaded first,
+e.g. by a <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseLoader</span></code>.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="bshark.compiler._compiler.Preprocessor.declared_class">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">declared_class</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Node</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#bshark.compiler._compiler.Preprocessor.declared_class" title="Link to this definition">#</a></dt>
+<dd><p>Returns the body of the unit.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="bshark.compiler._compiler.Preprocessor.get_creator">
+<span class="sig-name descname"><span class="pre">get_creator</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Node</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/bshark/compiler/_compiler.html#Preprocessor.get_creator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bshark.compiler._compiler.Preprocessor.get_creator" title="Link to this definition">#</a></dt>
+<dd><p>Resolves the CREATOR field in a parcelable class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="bshark.compiler._compiler.Preprocessor.get_parcel_constructor">
+<span class="sig-name descname"><span class="pre">get_parcel_constructor</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Node</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/bshark/compiler/_compiler.html#Preprocessor.get_parcel_constructor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bshark.compiler._compiler.Preprocessor.get_parcel_constructor" title="Link to this definition">#</a></dt>
+<dd><p>Resolves the constructor in a parcelable class.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="bshark.compiler._compiler.Preprocessor.is_compiled">
+<span class="sig-name descname"><span class="pre">is_compiled</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../_modules/bshark/compiler/_compiler.html#Preprocessor.is_compiled"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bshark.compiler._compiler.Preprocessor.is_compiled" title="Link to this definition">#</a></dt>
+<dd><p>Returns whether the unit is already compiled.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="bshark.compiler._compiler.Preprocessor.is_valid">
+<span class="sig-name descname"><span class="pre">is_valid</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../_modules/bshark/compiler/_compiler.html#Preprocessor.is_valid"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bshark.compiler._compiler.Preprocessor.is_valid" title="Link to this definition">#</a></dt>
+<dd><p>Returns whether the unit is valid.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="bshark.compiler._compiler.Preprocessor.lang">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">lang</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Language</span></em><a class="headerlink" href="#bshark.compiler._compiler.Preprocessor.lang" title="Link to this definition">#</a></dt>
+<dd><p>Returns the language of the unit.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="bshark.compiler._compiler.Preprocessor.qname">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">qname</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#bshark.compiler._compiler.Preprocessor.qname" title="Link to this definition">#</a></dt>
+<dd><p>Returns the qualified name of the unit.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="bshark.compiler._compiler.Preprocessor.rpath">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">rpath</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">str</span></em><a class="headerlink" href="#bshark.compiler._compiler.Preprocessor.rpath" title="Link to this definition">#</a></dt>
+<dd><p>Returns the relative path of the unit.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="internal-model-types">
+<h2>Internal Model Types<a class="headerlink" href="#internal-model-types" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="bshark.compiler._compiler.TypeHandler">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">bshark.compiler._compiler.</span></span><span class="sig-name descname"><span class="pre">TypeHandler</span></span><a class="reference internal" href="../_modules/bshark/compiler/_compiler.html#TypeHandler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bshark.compiler._compiler.TypeHandler" title="Link to this definition">#</a></dt>
+<dd><p>A special base class to support a mapping of type names to their
+corresponding Parcel calls.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="bshark.compiler._compiler.TypeHandler.call_from_expr">
+<span class="sig-name descname"><span class="pre">call_from_expr</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tracker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compiler</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#bshark.compiler._compiler.Compiler" title="bshark.compiler._compiler.Compiler"><span class="pre">Compiler</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../_modules/bshark/compiler/_compiler.html#TypeHandler.call_from_expr"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bshark.compiler._compiler.TypeHandler.call_from_expr" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="bshark.compiler._compiler.TypeHandler.call_of">
+<span class="sig-name descname"><span class="pre">call_of</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">type_decl</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compiler</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#bshark.compiler._compiler.Compiler" title="bshark.compiler._compiler.Compiler"><span class="pre">Compiler</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../_modules/bshark/compiler/_compiler.html#TypeHandler.call_of"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bshark.compiler._compiler.TypeHandler.call_of" title="Link to this definition">#</a></dt>
+<dd><p>Resolves the corresponding call in the Parcel class of a type name.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="bshark.compiler._compiler.TypeHandler.const_val_of">
+<span class="sig-name descname"><span class="pre">const_val_of</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compiler</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#bshark.compiler._compiler.Compiler" title="bshark.compiler._compiler.Compiler"><span class="pre">Compiler</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../_modules/bshark/compiler/_compiler.html#TypeHandler.const_val_of"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bshark.compiler._compiler.TypeHandler.const_val_of" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="bshark.compiler._compiler.NodeVisitor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">bshark.compiler._compiler.</span></span><span class="sig-name descname"><span class="pre">NodeVisitor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">compiler</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#bshark.compiler._compiler.Compiler" title="bshark.compiler._compiler.Compiler"><span class="pre">Compiler</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bshark/compiler/_compiler.html#NodeVisitor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bshark.compiler._compiler.NodeVisitor" title="Link to this definition">#</a></dt>
+<dd><p>A simple visitor class for traversing the AST.</p>
+<p>This class will be responsible for generating <code class="xref py py-class docutils literal notranslate"><span class="pre">FieldDef</span></code> and
+<code class="xref py py-class docutils literal notranslate"><span class="pre">ConditionDef</span></code> instances.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="bshark.compiler._compiler.NodeVisitor.visit">
+<span class="sig-name descname"><span class="pre">visit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">node</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tracker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="compilermodel.html#bshark.compiler.model.FieldDef" title="bshark.compiler.model.FieldDef"><span class="pre">FieldDef</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/bshark/compiler/_compiler.html#NodeVisitor.visit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bshark.compiler._compiler.NodeVisitor.visit" title="Link to this definition">#</a></dt>
+<dd><p>Traverses the given node and returns a list of <code class="xref py py-class docutils literal notranslate"><span class="pre">FieldDef</span></code>
+instances (optional).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="bshark.compiler._compiler.NodeVisitor.visit_assignment_expression">
+<span class="sig-name descname"><span class="pre">visit_assignment_expression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tracker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="compilermodel.html#bshark.compiler.model.FieldDef" title="bshark.compiler.model.FieldDef"><span class="pre">FieldDef</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/bshark/compiler/_compiler.html#NodeVisitor.visit_assignment_expression"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bshark.compiler._compiler.NodeVisitor.visit_assignment_expression" title="Link to this definition">#</a></dt>
+<dd><p>Parse an assignment statement and return a member definitions.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="bshark.compiler._compiler.NodeVisitor.visit_if_statement">
+<span class="sig-name descname"><span class="pre">visit_if_statement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tracker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="compilermodel.html#bshark.compiler.model.FieldDef" title="bshark.compiler.model.FieldDef"><span class="pre">FieldDef</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/bshark/compiler/_compiler.html#NodeVisitor.visit_if_statement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bshark.compiler._compiler.NodeVisitor.visit_if_statement" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="bshark.compiler._compiler.NodeVisitor.visit_local_variable_declaration">
+<span class="sig-name descname"><span class="pre">visit_local_variable_declaration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tracker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="compilermodel.html#bshark.compiler.model.FieldDef" title="bshark.compiler.model.FieldDef"><span class="pre">FieldDef</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/bshark/compiler/_compiler.html#NodeVisitor.visit_local_variable_declaration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bshark.compiler._compiler.NodeVisitor.visit_local_variable_declaration" title="Link to this definition">#</a></dt>
+<dd><p>Parse a local variable declaration and return a member definition.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="bshark.compiler._compiler.NodeVisitor.visit_method_invocation">
+<span class="sig-name descname"><span class="pre">visit_method_invocation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tracker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="compilermodel.html#bshark.compiler.model.FieldDef" title="bshark.compiler.model.FieldDef"><span class="pre">FieldDef</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/bshark/compiler/_compiler.html#NodeVisitor.visit_method_invocation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bshark.compiler._compiler.NodeVisitor.visit_method_invocation" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="bshark.compiler._compiler.NodeVisitor.visit_return_statement">
+<span class="sig-name descname"><span class="pre">visit_return_statement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tracker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="compilermodel.html#bshark.compiler.model.FieldDef" title="bshark.compiler.model.FieldDef"><span class="pre">FieldDef</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/bshark/compiler/_compiler.html#NodeVisitor.visit_return_statement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bshark.compiler._compiler.NodeVisitor.visit_return_statement" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="public-api">
+<h2>Public API<a class="headerlink" href="#public-api" title="Link to this heading">#</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="bshark.compiler._compiler.Compiler">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">bshark.compiler._compiler.</span></span><span class="sig-name descname"><span class="pre">Compiler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">unit</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="aidl.html#bshark.aidl.Unit" title="bshark.aidl.Unit"><span class="pre">Unit</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">loader</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="loader.html#bshark.compiler.BaseLoader" title="bshark.compiler.loader.BaseLoader"><span class="pre">BaseLoader</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">type_handler</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="#bshark.compiler._compiler.TypeHandler" title="bshark.compiler._compiler.TypeHandler"><span class="pre">TypeHandler</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">visitor_cls</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Type</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#bshark.compiler._compiler.NodeVisitor" title="bshark.compiler._compiler.NodeVisitor"><span class="pre">NodeVisitor</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/bshark/compiler/_compiler.html#Compiler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bshark.compiler._compiler.Compiler" title="Link to this definition">#</a></dt>
+<dd><p>The _compiler_ class is used to translate given AIDL definitions into
+a pre-defined structure that can be used to decode and potentially
+encode data.</p>
+<p>The internal processing depends on which type the underlying unit was
+associated with. For instance, <code class="code docutils literal notranslate"><span class="pre">BINDER</span></code> declarations will result
+in a different output than parsed <code class="code docutils literal notranslate"><span class="pre">PARCELABLE_JAVA</span></code> declarations.</p>
+<p>In general, the compiler tries to describe what operations need to be
+performed on a <code class="xref py py-class docutils literal notranslate"><span class="pre">Unit</span></code> in order to decode or encode data. There
+are predefined methods, which will be mapped to their Python equivalents:</p>
+<table class="table">
+<colgroup>
+<col style="width: 20.0%" />
+<col style="width: 80.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Method</p></th>
+<th class="head"><p>Python Type</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>readInt, readLong, readShort, readByte</p></td>
+<td><p>int</p></td>
+</tr>
+<tr class="row-odd"><td><p>readBoolean</p></td>
+<td><p>bool</p></td>
+</tr>
+<tr class="row-even"><td><p>readString</p></td>
+<td><p>str (<code class="code docutils literal notranslate"><span class="pre">utf-16-le</span></code> codec)</p></td>
+</tr>
+<tr class="row-odd"><td><p>readString8</p></td>
+<td><p>str (<code class="code docutils literal notranslate"><span class="pre">utf-8</span></code> codec)</p></td>
+</tr>
+<tr class="row-even"><td><p>readFloat, readDouble</p></td>
+<td><p>float</p></td>
+</tr>
+</tbody>
+</table>
+<ul class="simple">
+<li><p>Binder: All defined methods will be inspected and their parameters
+will be translated according to the scheme introduced before.</p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>unit</strong> (<a class="reference internal" href="aidl.html#bshark.aidl.Unit" title="bshark.aidl.Unit"><em>Unit</em></a>) – The unit to compile.</p></li>
+<li><p><strong>loader</strong> (<a class="reference internal" href="loader.html#bshark.compiler.BaseLoader" title="bshark.compiler.BaseLoader"><em>BaseLoader</em></a>) – The <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseLoader</span></code> object to use.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="bshark.compiler._compiler.Compiler.as_binder">
+<span class="sig-name descname"><span class="pre">as_binder</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="compilermodel.html#bshark.compiler.model.BinderDef" title="bshark.compiler.model.BinderDef"><span class="pre">BinderDef</span></a></span></span><a class="reference internal" href="../_modules/bshark/compiler/_compiler.html#Compiler.as_binder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bshark.compiler._compiler.Compiler.as_binder" title="Link to this definition">#</a></dt>
+<dd><p>Returns the given unit as a <code class="xref py py-class docutils literal notranslate"><span class="pre">BinderDef</span></code>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="bshark.compiler._compiler.Compiler.as_parcelable">
+<span class="sig-name descname"><span class="pre">as_parcelable</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="compilermodel.html#bshark.compiler.model.ParcelableDef" title="bshark.compiler.model.ParcelableDef"><span class="pre">ParcelableDef</span></a></span></span><a class="reference internal" href="../_modules/bshark/compiler/_compiler.html#Compiler.as_parcelable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bshark.compiler._compiler.Compiler.as_parcelable" title="Link to this definition">#</a></dt>
+<dd><p>Returns the given unit as a <code class="xref py py-class docutils literal notranslate"><span class="pre">ParcelableDef</span></code>.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="bshark.compiler._compiler.Compiler.compile">
+<span class="sig-name descname"><span class="pre">compile</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="compilermodel.html#bshark.compiler.model.BinderDef" title="bshark.compiler.model.BinderDef"><span class="pre">BinderDef</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference internal" href="compilermodel.html#bshark.compiler.model.ParcelableDef" title="bshark.compiler.model.ParcelableDef"><span class="pre">ParcelableDef</span></a></span></span><a class="reference internal" href="../_modules/bshark/compiler/_compiler.html#Compiler.compile"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bshark.compiler._compiler.Compiler.compile" title="Link to this definition">#</a></dt>
+<dd><p>Compiles the stored unit. (if possible)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="bshark.compiler._compiler.Compiler.get_assigned_member">
+<span class="sig-name descname"><span class="pre">get_assigned_member</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Node</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../_modules/bshark/compiler/_compiler.html#Compiler.get_assigned_member"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bshark.compiler._compiler.Compiler.get_assigned_member" title="Link to this definition">#</a></dt>
+<dd><p>Returns the name of the member that is assigned to.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="bshark.compiler._compiler.Compiler.get_import">
+<span class="sig-name descname"><span class="pre">get_import</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">qname</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="compilermodel.html#bshark.compiler.model.ImportDef" title="bshark.compiler.model.ImportDef"><span class="pre">ImportDef</span></a></span></span><a class="reference internal" href="../_modules/bshark/compiler/_compiler.html#Compiler.get_import"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bshark.compiler._compiler.Compiler.get_import" title="Link to this definition">#</a></dt>
+<dd><p>Returns the import with the given qualified name (or tries to import it).</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="bshark.compiler._compiler.Compiler.get_invocation_arguments">
+<span class="sig-name descname"><span class="pre">get_invocation_arguments</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">invocation</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Node</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/bshark/compiler/_compiler.html#Compiler.get_invocation_arguments"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bshark.compiler._compiler.Compiler.get_invocation_arguments" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="bshark.compiler._compiler.Compiler.get_local_member">
+<span class="sig-name descname"><span class="pre">get_local_member</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Node</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/bshark/compiler/_compiler.html#Compiler.get_local_member"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bshark.compiler._compiler.Compiler.get_local_member" title="Link to this definition">#</a></dt>
+<dd><p>Returns the name of the member that is assigned to.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="bshark.compiler._compiler.Compiler.get_method_call">
+<span class="sig-name descname"><span class="pre">get_method_call</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tracker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">Node</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/bshark/compiler/_compiler.html#Compiler.get_method_call"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bshark.compiler._compiler.Compiler.get_method_call" title="Link to this definition">#</a></dt>
+<dd><p>Tries to resolve a method invocation node from the given start node.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="bshark.compiler._compiler.Compiler.is_delegate">
+<span class="sig-name descname"><span class="pre">is_delegate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tracker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../_modules/bshark/compiler/_compiler.html#Compiler.is_delegate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bshark.compiler._compiler.Compiler.is_delegate" title="Link to this definition">#</a></dt>
+<dd><p>Check if a method is a delegate to another internal method (not constructor)</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="bshark.compiler._compiler.Compiler.is_local_assignment">
+<span class="sig-name descname"><span class="pre">is_local_assignment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tracker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../_modules/bshark/compiler/_compiler.html#Compiler.is_local_assignment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bshark.compiler._compiler.Compiler.is_local_assignment" title="Link to this definition">#</a></dt>
+<dd><p>Check if an expression is a local assignment with the tracker.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="bshark.compiler._compiler.Compiler.is_target_assignment">
+<span class="sig-name descname"><span class="pre">is_target_assignment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tracker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">bool</span></span></span><a class="reference internal" href="../_modules/bshark/compiler/_compiler.html#Compiler.is_target_assignment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bshark.compiler._compiler.Compiler.is_target_assignment" title="Link to this definition">#</a></dt>
+<dd><p>Check if an expression is an assignment with the tracker.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="bshark.compiler._compiler.Compiler.parse_condition">
+<span class="sig-name descname"><span class="pre">parse_condition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">expr</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tracker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="compilermodel.html#bshark.compiler.model.ConditionDef" title="bshark.compiler.model.ConditionDef"><span class="pre">ConditionDef</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/bshark/compiler/_compiler.html#Compiler.parse_condition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bshark.compiler._compiler.Compiler.parse_condition" title="Link to this definition">#</a></dt>
+<dd><p>Parse an if statement and return a condition definition.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="bshark.compiler._compiler.Compiler.resolve_parcel_tracker">
+<span class="sig-name descname"><span class="pre">resolve_parcel_tracker</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Node</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../_modules/bshark/compiler/_compiler.html#Compiler.resolve_parcel_tracker"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bshark.compiler._compiler.Compiler.resolve_parcel_tracker" title="Link to this definition">#</a></dt>
+<dd><p>Tries to retrieve the parameter name of the parcel argument</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="bshark.compiler._compiler.Compiler.resolved_imports">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">resolved_imports</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="compilermodel.html#bshark.compiler.model.ImportDefList" title="bshark.compiler.model.ImportDefList"><span class="pre">ImportDefList</span></a></em><a class="headerlink" href="#bshark.compiler._compiler.Compiler.resolved_imports" title="Link to this definition">#</a></dt>
+<dd><p>Returns the list of resolved imports.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="bshark.compiler._compiler.Compiler.trace_local">
+<span class="sig-name descname"><span class="pre">trace_local</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">body</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Node</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tracker</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">str</span></span></span><a class="reference internal" href="../_modules/bshark/compiler/_compiler.html#Compiler.trace_local"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#bshark.compiler._compiler.Compiler.trace_local" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="bshark.compiler._compiler.Compiler.unit">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">unit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="aidl.html#bshark.aidl.Unit" title="bshark.aidl.Unit"><span class="pre">Unit</span></a></em><a class="headerlink" href="#bshark.compiler._compiler.Compiler.unit" title="Link to this definition">#</a></dt>
+<dd><p>Returns the current unit.</p>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+    <a class="left-prev"
+       href="loader.html"
+       title="previous page">
+      <i class="fa-solid fa-angle-left"></i>
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">previous</p>
+        <p class="prev-next-title">Loader API</p>
+      </div>
+    </a>
+    <a class="right-next"
+       href="compilerutilities.html"
+       title="next page">
+      <div class="prev-next-info">
+        <p class="prev-next-subtitle">next</p>
+        <p class="prev-next-title">Compiler Utilities</p>
+      </div>
+      <i class="fa-solid fa-angle-right"></i>
+    </a>
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#preprocessing">Preprocessing</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#bshark.compiler._compiler.Preprocessor"><code class="docutils literal notranslate"><span class="pre">Preprocessor</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#bshark.compiler._compiler.Preprocessor.declared_class"><code class="docutils literal notranslate"><span class="pre">Preprocessor.declared_class</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#bshark.compiler._compiler.Preprocessor.get_creator"><code class="docutils literal notranslate"><span class="pre">Preprocessor.get_creator()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#bshark.compiler._compiler.Preprocessor.get_parcel_constructor"><code class="docutils literal notranslate"><span class="pre">Preprocessor.get_parcel_constructor()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#bshark.compiler._compiler.Preprocessor.is_compiled"><code class="docutils literal notranslate"><span class="pre">Preprocessor.is_compiled()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#bshark.compiler._compiler.Preprocessor.is_valid"><code class="docutils literal notranslate"><span class="pre">Preprocessor.is_valid()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#bshark.compiler._compiler.Preprocessor.lang"><code class="docutils literal notranslate"><span class="pre">Preprocessor.lang</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#bshark.compiler._compiler.Preprocessor.qname"><code class="docutils literal notranslate"><span class="pre">Preprocessor.qname</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#bshark.compiler._compiler.Preprocessor.rpath"><code class="docutils literal notranslate"><span class="pre">Preprocessor.rpath</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#internal-model-types">Internal Model Types</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#bshark.compiler._compiler.TypeHandler"><code class="docutils literal notranslate"><span class="pre">TypeHandler</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#bshark.compiler._compiler.TypeHandler.call_from_expr"><code class="docutils literal notranslate"><span class="pre">TypeHandler.call_from_expr()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#bshark.compiler._compiler.TypeHandler.call_of"><code class="docutils literal notranslate"><span class="pre">TypeHandler.call_of()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#bshark.compiler._compiler.TypeHandler.const_val_of"><code class="docutils literal notranslate"><span class="pre">TypeHandler.const_val_of()</span></code></a></li>
+</ul>
+</li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#bshark.compiler._compiler.NodeVisitor"><code class="docutils literal notranslate"><span class="pre">NodeVisitor</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#bshark.compiler._compiler.NodeVisitor.visit"><code class="docutils literal notranslate"><span class="pre">NodeVisitor.visit()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#bshark.compiler._compiler.NodeVisitor.visit_assignment_expression"><code class="docutils literal notranslate"><span class="pre">NodeVisitor.visit_assignment_expression()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#bshark.compiler._compiler.NodeVisitor.visit_if_statement"><code class="docutils literal notranslate"><span class="pre">NodeVisitor.visit_if_statement()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#bshark.compiler._compiler.NodeVisitor.visit_local_variable_declaration"><code class="docutils literal notranslate"><span class="pre">NodeVisitor.visit_local_variable_declaration()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#bshark.compiler._compiler.NodeVisitor.visit_method_invocation"><code class="docutils literal notranslate"><span class="pre">NodeVisitor.visit_method_invocation()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#bshark.compiler._compiler.NodeVisitor.visit_return_statement"><code class="docutils literal notranslate"><span class="pre">NodeVisitor.visit_return_statement()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#public-api">Public API</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#bshark.compiler._compiler.Compiler"><code class="docutils literal notranslate"><span class="pre">Compiler</span></code></a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#bshark.compiler._compiler.Compiler.as_binder"><code class="docutils literal notranslate"><span class="pre">Compiler.as_binder()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#bshark.compiler._compiler.Compiler.as_parcelable"><code class="docutils literal notranslate"><span class="pre">Compiler.as_parcelable()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#bshark.compiler._compiler.Compiler.compile"><code class="docutils literal notranslate"><span class="pre">Compiler.compile()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#bshark.compiler._compiler.Compiler.get_assigned_member"><code class="docutils literal notranslate"><span class="pre">Compiler.get_assigned_member()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#bshark.compiler._compiler.Compiler.get_import"><code class="docutils literal notranslate"><span class="pre">Compiler.get_import()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#bshark.compiler._compiler.Compiler.get_invocation_arguments"><code class="docutils literal notranslate"><span class="pre">Compiler.get_invocation_arguments()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#bshark.compiler._compiler.Compiler.get_local_member"><code class="docutils literal notranslate"><span class="pre">Compiler.get_local_member()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#bshark.compiler._compiler.Compiler.get_method_call"><code class="docutils literal notranslate"><span class="pre">Compiler.get_method_call()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#bshark.compiler._compiler.Compiler.is_delegate"><code class="docutils literal notranslate"><span class="pre">Compiler.is_delegate()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#bshark.compiler._compiler.Compiler.is_local_assignment"><code class="docutils literal notranslate"><span class="pre">Compiler.is_local_assignment()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#bshark.compiler._compiler.Compiler.is_target_assignment"><code class="docutils literal notranslate"><span class="pre">Compiler.is_target_assignment()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#bshark.compiler._compiler.Compiler.parse_condition"><code class="docutils literal notranslate"><span class="pre">Compiler.parse_condition()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#bshark.compiler._compiler.Compiler.resolve_parcel_tracker"><code class="docutils literal notranslate"><span class="pre">Compiler.resolve_parcel_tracker()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#bshark.compiler._compiler.Compiler.resolved_imports"><code class="docutils literal notranslate"><span class="pre">Compiler.resolved_imports</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#bshark.compiler._compiler.Compiler.trace_local"><code class="docutils literal notranslate"><span class="pre">Compiler.trace_local()</span></code></a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#bshark.compiler._compiler.Compiler.unit"><code class="docutils literal notranslate"><span class="pre">Compiler.unit</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+  </nav></div>
+
+  <div class="sidebar-secondary-item">
+
+  <div class="tocsection sourcelink">
+    <a href="../_sources/api/compiler.rst.txt">
+      <i class="fa-solid fa-file-lines"></i> Show Source
+    </a>
+  </div>
+</div>
+
+</div></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2024, MatrixEditor.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.2.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

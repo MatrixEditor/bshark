@@ -1,0 +1,1399 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="../../../" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>bshark.compiler._compiler &#8212; bshark 0.1-beta documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="../../../_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../../_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="../../../_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+  
+  <link href="../../../_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="../../../_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="../../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="../../../_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script src="../../../_static/documentation_options.js?v=91ca89c4"></script>
+    <script src="../../../_static/doctools.js?v=9a2dae69"></script>
+    <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/design-tabs.js?v=36754332"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/bshark/compiler/_compiler';</script>
+    <link rel="icon" href="../../../_static/favicon.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="../../../search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+
+<a class="navbar-brand logo" href="../../../index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="../../../_static/favicon.ico" class="logo__image only-light" alt=""/>
+    <script>document.write(`<img src="../../../_static/favicon.ico" class="logo__image only-dark" alt=""/>`);</script>
+  
+  
+    <p class="title logo__title">bshark</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../cmd.html">
+                        CLI Reference and Usage
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../api/index.html">
+                        Library Internals
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/MatrixEditor/bshark" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../cmd.html">
+                        CLI Reference and Usage
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="../../../api/index.html">
+                        Library Internals
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/MatrixEditor/bshark" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article">
+<div class="header-article-items header-article__inner">
+  
+    <div class="header-article-items__start">
+      
+        <div class="header-article-item">
+
+
+
+<nav aria-label="Breadcrumb">
+  <ul class="bd-breadcrumbs">
+    
+    <li class="breadcrumb-item breadcrumb-home">
+      <a href="../../../index.html" class="nav-link" aria-label="Home">
+        <i class="fa-solid fa-home"></i>
+      </a>
+    </li>
+    
+    <li class="breadcrumb-item"><a href="../../index.html" class="nav-link">Module code</a></li>
+    
+    <li class="breadcrumb-item active" aria-current="page">bshark.compi...</li>
+  </ul>
+</nav>
+</div>
+      
+    </div>
+  
+  
+</div>
+</div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+  <h1>Source code for bshark.compiler._compiler</h1><div class="highlight"><pre>
+<span></span><span class="c1"># MIT License</span>
+<span class="c1">#</span>
+<span class="c1"># Copyright (c) 2024 MatrixEditor</span>
+<span class="c1">#</span>
+<span class="c1"># Permission is hereby granted, free of charge, to any person obtaining a copy</span>
+<span class="c1"># of this software and associated documentation files (the &quot;Software&quot;), to deal</span>
+<span class="c1"># in the Software without restriction, including without limitation the rights</span>
+<span class="c1"># to use, copy, modify, merge, publish, distribute, sublicense, and/or sell</span>
+<span class="c1"># copies of the Software, and to permit persons to whom the Software is</span>
+<span class="c1"># furnished to do so, subject to the following conditions:</span>
+<span class="c1">#</span>
+<span class="c1"># The above copyright notice and this permission notice shall be included in all</span>
+<span class="c1"># copies or substantial portions of the Software.</span>
+<span class="c1">#</span>
+<span class="c1"># THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR</span>
+<span class="c1"># IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,</span>
+<span class="c1"># FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE</span>
+<span class="c1"># AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER</span>
+<span class="c1"># LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,</span>
+<span class="c1"># OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE</span>
+<span class="c1"># SOFTWARE.</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">typing</span> <span class="k">as</span> <span class="nn">t</span>
+
+<span class="kn">from</span> <span class="nn">tree_sitter</span> <span class="kn">import</span> <span class="n">Node</span><span class="p">,</span> <span class="n">Language</span>
+
+<span class="kn">from</span> <span class="nn">bshark</span> <span class="kn">import</span> <span class="n">FULL_AIDL_EXT</span>
+<span class="kn">from</span> <span class="nn">bshark.aidl</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">AIDL</span><span class="p">,</span>
+    <span class="n">JAVA</span><span class="p">,</span>
+    <span class="n">Unit</span><span class="p">,</span>
+    <span class="n">get_methods</span><span class="p">,</span>
+    <span class="n">get_binder_methods</span><span class="p">,</span>
+    <span class="n">get_parameters</span><span class="p">,</span>
+    <span class="n">get_parameter_modifier</span><span class="p">,</span>
+    <span class="n">get_class_by_name</span><span class="p">,</span>
+    <span class="n">Constants</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">bshark.compiler.model</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ParcelableDef</span><span class="p">,</span>
+    <span class="n">BinderDef</span><span class="p">,</span>
+    <span class="n">FieldDef</span><span class="p">,</span>
+    <span class="n">MethodDef</span><span class="p">,</span>
+    <span class="n">ParameterDef</span><span class="p">,</span>
+    <span class="n">ReturnDef</span><span class="p">,</span>
+    <span class="n">Stop</span><span class="p">,</span>
+    <span class="n">ConditionDef</span><span class="p">,</span>
+    <span class="n">ImportDef</span><span class="p">,</span>
+    <span class="n">ImportDefList</span><span class="p">,</span>
+    <span class="n">Direction</span><span class="p">,</span>
+    <span class="n">QName</span><span class="p">,</span>
+    <span class="n">RPath</span><span class="p">,</span>
+    <span class="n">Type</span><span class="p">,</span>
+    <span class="n">Complex</span><span class="p">,</span>
+    <span class="n">Primitive</span><span class="p">,</span>
+    <span class="n">UnsupportedTypeError</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">bshark.compiler.loader</span> <span class="kn">import</span> <span class="n">BaseLoader</span>
+<span class="kn">from</span> <span class="nn">bshark.compiler.util</span> <span class="kn">import</span> <span class="n">get_declaring_class</span>
+
+
+<span class="n">PARCEL_TYPE_NAME</span> <span class="o">=</span> <span class="s2">&quot;Parcel&quot;</span>
+<span class="n">PARCEL_QNAME</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;android.os.</span><span class="si">{</span><span class="n">PARCEL_TYPE_NAME</span><span class="si">}</span><span class="s2">&quot;</span>
+
+
+<span class="c1"># --- internal method ---</span>
+<span class="k">def</span> <span class="nf">txt</span><span class="p">(</span><span class="n">node</span><span class="p">:</span> <span class="n">Node</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">return</span> <span class="n">node</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span> <span class="k">if</span> <span class="n">node</span> <span class="k">else</span> <span class="kc">None</span>
+
+<span class="c1"># ---</span>
+
+
+<div class="viewcode-block" id="Preprocessor">
+<a class="viewcode-back" href="../../../api/compiler.html#bshark.compiler._compiler.Preprocessor">[docs]</a>
+<span class="k">class</span> <span class="nc">Preprocessor</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A preprocessor for AIDL files.</span>
+
+<span class="sd">    This simple class can be used to view and inspect basic characteristics</span>
+<span class="sd">    of AIDL (and Java) files. The base :class:`Unit` must be loaded first,</span>
+<span class="sd">    e.g. by a :class:`BaseLoader`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unit</span><span class="p">:</span> <span class="n">Unit</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">unit</span> <span class="o">=</span> <span class="n">unit</span>
+        <span class="c1"># some processing must be done before we can compile</span>
+        <span class="c1"># the given unit.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">members</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Node</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_members</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">methods</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Node</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_methods</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">constructors</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">Node</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_constructors</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">extends</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_superclasses</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">implements</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_interfaces</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">lang</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Language</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the language of the unit.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">type</span> <span class="ow">in</span> <span class="p">(</span><span class="n">Type</span><span class="o">.</span><span class="n">PARCELABLE</span><span class="p">,</span> <span class="n">Type</span><span class="o">.</span><span class="n">BINDER</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">AIDL</span>
+        <span class="k">return</span> <span class="n">JAVA</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">qname</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">QName</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the qualified name of the unit.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">package</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">rpath</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RPath</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the relative path of the unit.&quot;&quot;&quot;</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">get_declaring_class</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">qname</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;/&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">Type</span><span class="o">.</span><span class="n">PARCELABLE_JAVA</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">.java&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_compiled</span><span class="p">():</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">.json&quot;</span>
+        <span class="k">return</span> <span class="n">path</span> <span class="o">+</span> <span class="n">FULL_AIDL_EXT</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">declared_class</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Node</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the body of the unit.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">body</span>
+
+    <span class="c1"># --- public API methods ---</span>
+
+<div class="viewcode-block" id="Preprocessor.is_compiled">
+<a class="viewcode-back" href="../../../api/compiler.html#bshark.compiler._compiler.Preprocessor.is_compiled">[docs]</a>
+    <span class="k">def</span> <span class="nf">is_compiled</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns whether the unit is already compiled.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">body</span><span class="p">,</span> <span class="p">(</span><span class="n">ParcelableDef</span><span class="p">,</span> <span class="n">BinderDef</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="Preprocessor.is_valid">
+<a class="viewcode-back" href="../../../api/compiler.html#bshark.compiler._compiler.Preprocessor.is_valid">[docs]</a>
+    <span class="k">def</span> <span class="nf">is_valid</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns whether the unit is valid.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">body</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="Preprocessor.get_creator">
+<a class="viewcode-back" href="../../../api/compiler.html#bshark.compiler._compiler.Preprocessor.get_creator">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_creator</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Node</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolves the CREATOR field in a parcelable class.&quot;&quot;&quot;</span>
+        <span class="n">field_decl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">members</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;CREATOR&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">field_decl</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="c1"># TODO: find a better way of getting the class body</span>
+        <span class="n">class_body</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">field_decl</span><span class="o">.</span><span class="n">child_by_field_name</span><span class="p">(</span><span class="s2">&quot;declarator&quot;</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">child_by_field_name</span><span class="p">(</span><span class="s2">&quot;value&quot;</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">named_child</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">methods</span> <span class="o">=</span> <span class="n">get_methods</span><span class="p">(</span><span class="n">class_body</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lang</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="n">class_body</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">methods</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;createFromParcel&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Preprocessor.get_parcel_constructor">
+<a class="viewcode-back" href="../../../api/compiler.html#bshark.compiler._compiler.Preprocessor.get_parcel_constructor">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_parcel_constructor</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Node</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolves the constructor in a parcelable class.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">constructor</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">constructors</span><span class="p">:</span>
+            <span class="n">parameters</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">get_parameters</span><span class="p">(</span><span class="n">constructor</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lang</span><span class="p">)</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+
+            <span class="c1"># The constructor MUST have exactly one parameter and this</span>
+            <span class="c1"># parameter must be of type Parcel.</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="n">type_name</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">child_by_field_name</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">type_name</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span> <span class="ow">in</span> <span class="p">(</span><span class="n">PARCEL_TYPE_NAME</span><span class="p">,</span> <span class="n">PARCEL_QNAME</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">constructor</span>
+
+        <span class="c1"># return nothing instead of throwing an exception as this</span>
+        <span class="c1"># is an optional inspection element.</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+    <span class="c1"># --- internal helpers ---</span>
+
+    <span class="k">def</span> <span class="nf">_get_members</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">t</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Node</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Processes all members of the current unit.</span>
+
+<span class="sd">        This method will return a dictionary with the field&#39;s name</span>
+<span class="sd">        mapped to the field&#39;s type.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_compiled</span><span class="p">()</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="k">return</span> <span class="p">{}</span>
+
+        <span class="n">body</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">declared_class</span><span class="o">.</span><span class="n">child_by_field_name</span><span class="p">(</span><span class="s2">&quot;body&quot;</span><span class="p">)</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lang</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">Constants</span><span class="o">.</span><span class="n">FIELD_DECL</span><span class="si">}</span><span class="s2">) @type&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="n">x</span><span class="o">.</span><span class="n">child_by_field_name</span><span class="p">(</span><span class="s2">&quot;declarator&quot;</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">child_by_field_name</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">decode</span><span class="p">():</span> <span class="n">x</span>
+            <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">query</span><span class="o">.</span><span class="n">captures</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">body</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">parent</span> <span class="o">==</span> <span class="n">body</span>
+        <span class="p">}</span>
+
+    <span class="k">def</span> <span class="nf">_get_methods</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">t</span><span class="o">.</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Node</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Processes all methods of the current unit.</span>
+
+<span class="sd">        This method will return a dictionary with the method&#39;s name</span>
+<span class="sd">        mapped to the method&#39;s body.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_compiled</span><span class="p">()</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="k">return</span> <span class="p">{}</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">Type</span><span class="o">.</span><span class="n">BINDER</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">get_binder_methods</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">body</span><span class="p">)</span>
+
+        <span class="n">body</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">declared_class</span><span class="o">.</span><span class="n">child_by_field_name</span><span class="p">(</span><span class="s2">&quot;body&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">get_methods</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">body</span><span class="p">,</span> <span class="n">JAVA</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="n">body</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_constructors</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">t</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">Node</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the constructors of the current unit.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_compiled</span><span class="p">()</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="k">return</span> <span class="p">[]</span>
+
+        <span class="n">query</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lang</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">Constants</span><span class="o">.</span><span class="n">CONSTUCTOR_DECL</span><span class="si">}</span><span class="s2">) @type&quot;</span><span class="p">)</span>
+        <span class="n">body</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">declared_class</span><span class="o">.</span><span class="n">child_by_field_name</span><span class="p">(</span><span class="s2">&quot;body&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">query</span><span class="o">.</span><span class="n">captures</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">body</span><span class="p">)</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">parent</span> <span class="o">==</span> <span class="n">body</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_get_superclasses</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">t</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the superclasses of the current unit.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_compiled</span><span class="p">()</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="k">return</span> <span class="p">{}</span>
+
+        <span class="n">query</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lang</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;(superclass) @type&quot;</span><span class="p">)</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">captures</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">body</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="n">txt</span><span class="p">(</span><span class="n">result</span><span class="o">.</span><span class="n">named_child</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">result</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">results</span>
+            <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">parent</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">body</span>
+        <span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">_get_interfaces</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">t</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the interfaces of the current unit.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_compiled</span><span class="p">()</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="k">return</span> <span class="p">{}</span>
+
+        <span class="n">query</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">lang</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">&quot;(super_interfaces) @type&quot;</span><span class="p">)</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">captures</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">body</span><span class="p">)</span>
+        <span class="n">interfaces</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">super_interfaces</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">super_interfaces</span><span class="o">.</span><span class="n">parent</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">body</span><span class="p">:</span>
+                <span class="n">interfaces</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+                    <span class="p">[</span><span class="n">txt</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">super_interfaces</span><span class="o">.</span><span class="n">named_child</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">named_children</span><span class="p">]</span>
+                <span class="p">)</span>
+        <span class="k">return</span> <span class="n">interfaces</span></div>
+
+
+
+<div class="viewcode-block" id="TypeHandler">
+<a class="viewcode-back" href="../../../api/compiler.html#bshark.compiler._compiler.TypeHandler">[docs]</a>
+<span class="k">class</span> <span class="nc">TypeHandler</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A special base class to support a mapping of type names to their</span>
+<span class="sd">    corresponding Parcel calls.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="TypeHandler.call_of">
+<a class="viewcode-back" href="../../../api/compiler.html#bshark.compiler._compiler.TypeHandler.call_of">[docs]</a>
+    <span class="k">def</span> <span class="nf">call_of</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">type_decl</span><span class="p">:</span> <span class="n">Node</span><span class="p">,</span> <span class="n">compiler</span><span class="p">:</span> <span class="s2">&quot;Compiler&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolves the corresponding call in the Parcel class of a type name.&quot;&quot;&quot;</span>
+
+        <span class="c1"># 1. Check if there are dimensions associated with the type name</span>
+        <span class="n">array</span> <span class="o">=</span> <span class="s2">&quot;Vector&quot;</span> <span class="k">if</span> <span class="n">type_decl</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">&quot;array_type&quot;</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+        <span class="n">clean_name</span> <span class="o">=</span> <span class="n">type_decl</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;[]&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+        <span class="c1"># primitive values can be parsed directly</span>
+        <span class="k">if</span> <span class="n">clean_name</span> <span class="ow">in</span> <span class="n">Primitive</span><span class="o">.</span><span class="n">VALUES</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;read</span><span class="si">{</span><span class="n">clean_name</span><span class="o">.</span><span class="n">capitalize</span><span class="p">()</span><span class="si">}{</span><span class="n">array</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="c1"># 2. Check if the type name is in the list of types</span>
+        <span class="c1"># that are special</span>
+        <span class="k">if</span> <span class="n">clean_name</span> <span class="ow">in</span> <span class="n">Complex</span><span class="o">.</span><span class="n">VALUES</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">Complex</span><span class="o">.</span><span class="n">VALUES</span><span class="p">[</span><span class="n">clean_name</span><span class="p">]</span> <span class="o">+</span> <span class="n">array</span>
+
+        <span class="k">if</span> <span class="n">type_decl</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">&quot;generic_type&quot;</span><span class="p">:</span>
+            <span class="n">clean_name</span> <span class="o">=</span> <span class="n">type_decl</span><span class="o">.</span><span class="n">child</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+            <span class="n">arguments</span> <span class="o">=</span> <span class="n">type_decl</span><span class="o">.</span><span class="n">child</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">match</span> <span class="n">clean_name</span><span class="p">:</span>
+                <span class="k">case</span> <span class="s2">&quot;List&quot;</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">arguments</span><span class="o">.</span><span class="n">child_count</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;readParcelable</span><span class="si">{</span><span class="n">array</span><span class="si">}</span><span class="s2">:java.util.List&quot;</span>
+
+                    <span class="n">ref_ty</span> <span class="o">=</span> <span class="n">arguments</span><span class="o">.</span><span class="n">named_child</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">ref_ty</span> <span class="ow">in</span> <span class="n">Complex</span><span class="o">.</span><span class="n">VALUES</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;readList:</span><span class="si">{</span><span class="n">Complex</span><span class="o">.</span><span class="n">VALUES</span><span class="p">[</span><span class="n">ref_ty</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="n">idef</span> <span class="o">=</span> <span class="n">compiler</span><span class="o">.</span><span class="n">get_import</span><span class="p">(</span><span class="n">ref_ty</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;readList:</span><span class="si">{</span><span class="n">idef</span><span class="o">.</span><span class="n">qname</span><span class="si">}</span><span class="s2">&quot;</span>
+
+                <span class="k">case</span> <span class="s2">&quot;ParceledListSlice&quot;</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">arguments</span><span class="o">.</span><span class="n">child_count</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;readParcelable</span><span class="si">{</span><span class="n">array</span><span class="si">}</span><span class="s2">:android.app.ParceledListSlice&quot;</span>
+
+                    <span class="n">ref_ty</span> <span class="o">=</span> <span class="n">arguments</span><span class="o">.</span><span class="n">named_child</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="n">ref_ty</span> <span class="ow">in</span> <span class="n">Complex</span><span class="o">.</span><span class="n">VALUES</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;readParceledListSlice:</span><span class="si">{</span><span class="n">Complex</span><span class="o">.</span><span class="n">VALUES</span><span class="p">[</span><span class="n">ref_ty</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="n">idef</span> <span class="o">=</span> <span class="n">compiler</span><span class="o">.</span><span class="n">get_import</span><span class="p">(</span><span class="n">ref_ty</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;readParceledListSlice:</span><span class="si">{</span><span class="n">idef</span><span class="o">.</span><span class="n">qname</span><span class="si">}</span><span class="s2">&quot;</span>
+
+                <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Unsupported generic type </span><span class="si">{</span><span class="n">type_decl</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span><span class="si">!r}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
+
+        <span class="c1"># 3. Check if the type name is in the imports</span>
+        <span class="n">idef</span> <span class="o">=</span> <span class="n">compiler</span><span class="o">.</span><span class="n">get_import</span><span class="p">(</span><span class="n">clean_name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;readParcelable</span><span class="si">{</span><span class="n">array</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">idef</span><span class="o">.</span><span class="n">qname</span><span class="si">}</span><span class="s2">&quot;</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_qname_from_creator_access</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">identifier</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">compiler</span><span class="p">:</span> <span class="s2">&quot;Compiler&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolves the qualified name of a creator field.&quot;&quot;&quot;</span>
+        <span class="n">target</span> <span class="o">=</span> <span class="n">identifier</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">target</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">idef</span> <span class="o">=</span> <span class="n">compiler</span><span class="o">.</span><span class="n">get_import</span><span class="p">(</span><span class="n">target</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">qname</span> <span class="o">=</span> <span class="n">idef</span><span class="o">.</span><span class="n">qname</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">idef</span> <span class="o">=</span> <span class="n">compiler</span><span class="o">.</span><span class="n">get_import</span><span class="p">(</span><span class="n">target</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">qname</span> <span class="o">=</span> <span class="s2">&quot;.&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">idef</span><span class="o">.</span><span class="n">qname</span><span class="p">]</span> <span class="o">+</span> <span class="n">target</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">qname</span>
+
+<div class="viewcode-block" id="TypeHandler.call_from_expr">
+<a class="viewcode-back" href="../../../api/compiler.html#bshark.compiler._compiler.TypeHandler.call_from_expr">[docs]</a>
+    <span class="k">def</span> <span class="nf">call_from_expr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expr</span><span class="p">:</span> <span class="n">Node</span><span class="p">,</span> <span class="n">tracker</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">compiler</span><span class="p">:</span> <span class="s2">&quot;Compiler&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">method</span> <span class="o">=</span> <span class="n">compiler</span><span class="o">.</span><span class="n">get_method_call</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">tracker</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">method</span><span class="p">:</span>
+            <span class="c1"># Either the qualifier is the Parcel object (tracker) or</span>
+            <span class="c1"># it is defined as an argument.</span>
+            <span class="n">qualifier</span> <span class="o">=</span> <span class="n">txt</span><span class="p">(</span><span class="n">method</span><span class="o">.</span><span class="n">child_by_field_name</span><span class="p">(</span><span class="s2">&quot;object&quot;</span><span class="p">))</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">txt</span><span class="p">(</span><span class="n">method</span><span class="o">.</span><span class="n">child_by_field_name</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">))</span>
+            <span class="n">raw_args</span> <span class="o">=</span> <span class="n">method</span><span class="o">.</span><span class="n">child_by_field_name</span><span class="p">(</span><span class="s2">&quot;arguments&quot;</span><span class="p">)</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="n">compiler</span><span class="o">.</span><span class="n">get_invocation_arguments</span><span class="p">(</span><span class="n">raw_args</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">qualifier</span> <span class="o">==</span> <span class="n">tracker</span><span class="p">:</span>
+                <span class="c1"># By default we just record the method name</span>
+                <span class="k">match</span> <span class="n">name</span><span class="p">:</span>
+                    <span class="k">case</span> <span class="s2">&quot;readTypedList&quot;</span><span class="p">:</span>
+                        <span class="n">target</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+                        <span class="k">pass</span>
+
+                    <span class="k">case</span> <span class="s2">&quot;readTypedObject&quot;</span><span class="p">:</span>
+                        <span class="n">target</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;readParcelable:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_qname_from_creator_access</span><span class="p">(</span><span class="n">target</span><span class="p">,</span><span class="w"> </span><span class="n">compiler</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+
+                    <span class="k">case</span> <span class="s2">&quot;createTypedArray&quot;</span><span class="p">:</span>
+                        <span class="n">target</span> <span class="o">=</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;readList:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_qname_from_creator_access</span><span class="p">(</span><span class="n">target</span><span class="p">,</span><span class="w"> </span><span class="n">compiler</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="n">name</span>
+
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># The object is another CREATOR</span>
+                <span class="n">field</span> <span class="o">=</span> <span class="n">method</span><span class="o">.</span><span class="n">child_by_field_name</span><span class="p">(</span><span class="s2">&quot;object&quot;</span><span class="p">)</span>
+                <span class="k">match</span> <span class="n">field</span><span class="o">.</span><span class="n">type</span><span class="p">:</span>
+                    <span class="k">case</span> <span class="n">Constants</span><span class="o">.</span><span class="n">FIELD_ACCESS</span><span class="p">:</span>
+                        <span class="n">target</span> <span class="o">=</span> <span class="n">txt</span><span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">named_child</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span>
+                    <span class="k">case</span> <span class="n">Constants</span><span class="o">.</span><span class="n">IDENTIFIER</span><span class="p">:</span>
+                        <span class="n">target</span> <span class="o">=</span> <span class="n">txt</span><span class="p">(</span><span class="n">field</span><span class="p">)</span>
+                <span class="n">idef</span> <span class="o">=</span> <span class="n">compiler</span><span class="o">.</span><span class="n">get_import</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+                <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;readParcelable:</span><span class="si">{</span><span class="n">idef</span><span class="o">.</span><span class="n">qname</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="k">return</span> <span class="s2">&quot;...&quot;</span></div>
+
+
+<div class="viewcode-block" id="TypeHandler.const_val_of">
+<a class="viewcode-back" href="../../../api/compiler.html#bshark.compiler._compiler.TypeHandler.const_val_of">[docs]</a>
+    <span class="k">def</span> <span class="nf">const_val_of</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expr</span><span class="p">:</span> <span class="n">Node</span><span class="p">,</span> <span class="n">compiler</span><span class="p">:</span> <span class="s2">&quot;Compiler&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;...&quot;</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="NodeVisitor">
+<a class="viewcode-back" href="../../../api/compiler.html#bshark.compiler._compiler.NodeVisitor">[docs]</a>
+<span class="k">class</span> <span class="nc">NodeVisitor</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A simple visitor class for traversing the AST.</span>
+
+<span class="sd">    This class will be responsible for generating :class:`FieldDef` and</span>
+<span class="sd">    :class:`ConditionDef` instances.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">compiler</span><span class="p">:</span> <span class="s2">&quot;Compiler&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">compiler</span> <span class="o">=</span> <span class="n">compiler</span>
+
+<div class="viewcode-block" id="NodeVisitor.visit">
+<a class="viewcode-back" href="../../../api/compiler.html#bshark.compiler._compiler.NodeVisitor.visit">[docs]</a>
+    <span class="k">def</span> <span class="nf">visit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">node</span><span class="p">:</span> <span class="n">Node</span><span class="p">,</span> <span class="n">tracker</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">t</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">FieldDef</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Traverses the given node and returns a list of :class:`FieldDef`</span>
+<span class="sd">        instances (optional).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">func</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;visit_</span><span class="si">{</span><span class="n">node</span><span class="o">.</span><span class="n">type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">func</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">tracker</span><span class="p">,</span> <span class="n">index</span><span class="p">)</span> <span class="ow">or</span> <span class="p">[]</span> <span class="k">if</span> <span class="n">func</span> <span class="k">else</span> <span class="p">[]</span></div>
+
+
+<div class="viewcode-block" id="NodeVisitor.visit_local_variable_declaration">
+<a class="viewcode-back" href="../../../api/compiler.html#bshark.compiler._compiler.NodeVisitor.visit_local_variable_declaration">[docs]</a>
+    <span class="k">def</span> <span class="nf">visit_local_variable_declaration</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">expr</span><span class="p">:</span> <span class="n">Node</span><span class="p">,</span> <span class="n">tracker</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">FieldDef</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse a local variable declaration and return a member definition.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">compiler</span><span class="o">.</span><span class="n">is_local_assignment</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">tracker</span><span class="p">):</span>
+            <span class="c1"># Local variable: we try to trace the value to the final field</span>
+            <span class="n">local_member</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compiler</span><span class="o">.</span><span class="n">get_local_member</span><span class="p">(</span><span class="n">expr</span><span class="p">)</span>
+            <span class="n">member</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compiler</span><span class="o">.</span><span class="n">trace_local</span><span class="p">(</span><span class="n">expr</span><span class="o">.</span><span class="n">parent</span><span class="p">,</span> <span class="n">local_member</span><span class="p">)</span>
+            <span class="n">call</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compiler</span><span class="o">.</span><span class="n">th</span><span class="o">.</span><span class="n">call_from_expr</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">tracker</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">compiler</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">FieldDef</span><span class="p">(</span><span class="n">member</span><span class="p">,</span> <span class="n">call</span><span class="p">)]</span></div>
+
+
+<div class="viewcode-block" id="NodeVisitor.visit_assignment_expression">
+<a class="viewcode-back" href="../../../api/compiler.html#bshark.compiler._compiler.NodeVisitor.visit_assignment_expression">[docs]</a>
+    <span class="k">def</span> <span class="nf">visit_assignment_expression</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">expr</span><span class="p">:</span> <span class="n">Node</span><span class="p">,</span> <span class="n">tracker</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">t</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">FieldDef</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse an assignment statement and return a member definitions.&quot;&quot;&quot;</span>
+        <span class="c1"># The assignment must explicitly contain the tracker</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">compiler</span><span class="o">.</span><span class="n">is_target_assignment</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">tracker</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">[]</span>
+
+            <span class="c1"># Local variable: we try to trace the value to the final field</span>
+            <span class="c1"># # assignment</span>
+            <span class="c1"># local_member = self.compiler.get_local_member(expr)</span>
+            <span class="c1"># member = self.compiler.trace_local(expr.body, local_member)</span>
+        <span class="n">member</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compiler</span><span class="o">.</span><span class="n">get_assigned_member</span><span class="p">(</span><span class="n">expr</span><span class="p">)</span>
+        <span class="c1"># retrieve the target Parcel method call and add</span>
+        <span class="c1"># the new member to the list</span>
+        <span class="n">call</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compiler</span><span class="o">.</span><span class="n">th</span><span class="o">.</span><span class="n">call_from_expr</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">tracker</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">compiler</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">FieldDef</span><span class="p">(</span><span class="n">member</span><span class="p">,</span> <span class="n">call</span><span class="p">)]</span></div>
+
+
+<div class="viewcode-block" id="NodeVisitor.visit_return_statement">
+<a class="viewcode-back" href="../../../api/compiler.html#bshark.compiler._compiler.NodeVisitor.visit_return_statement">[docs]</a>
+    <span class="k">def</span> <span class="nf">visit_return_statement</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">expr</span><span class="p">:</span> <span class="n">Node</span><span class="p">,</span> <span class="n">tracker</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">FieldDef</span><span class="p">]]:</span>
+        <span class="c1"># Return statement with (possible) tracker as argument</span>
+        <span class="n">ctor</span> <span class="o">=</span> <span class="n">expr</span><span class="o">.</span><span class="n">named_child</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">ctor</span><span class="o">.</span><span class="n">type</span> <span class="o">!=</span> <span class="n">Constants</span><span class="o">.</span><span class="n">OBJ_CREATION_EXPR</span><span class="p">:</span>
+            <span class="c1"># end the loop on other return statements</span>
+            <span class="k">raise</span> <span class="ne">StopIteration</span>
+
+        <span class="n">args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compiler</span><span class="o">.</span><span class="n">get_invocation_arguments</span><span class="p">(</span>
+            <span class="n">ctor</span><span class="o">.</span><span class="n">child_by_field_name</span><span class="p">(</span><span class="s2">&quot;arguments&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">tracker</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+            <span class="c1"># NOTE: we assert here, that the constructor is defined</span>
+            <span class="n">ctor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compiler</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">get_parcel_constructor</span><span class="p">()</span>
+            <span class="n">ctor_tracker</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compiler</span><span class="o">.</span><span class="n">resolve_parcel_tracker</span><span class="p">(</span><span class="n">ctor</span><span class="p">)</span>  <span class="c1">#</span>
+            <span class="c1"># pylint: disable-next=protected-access</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">compiler</span><span class="o">.</span><span class="n">_parse_parcelable_java</span><span class="p">(</span><span class="n">ctor</span><span class="p">,</span> <span class="n">ctor_tracker</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="NodeVisitor.visit_if_statement">
+<a class="viewcode-back" href="../../../api/compiler.html#bshark.compiler._compiler.NodeVisitor.visit_if_statement">[docs]</a>
+    <span class="k">def</span> <span class="nf">visit_if_statement</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">expr</span><span class="p">:</span> <span class="n">Node</span><span class="p">,</span> <span class="n">tracker</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">FieldDef</span><span class="p">]]:</span>
+        <span class="c1"># we will trace if statements as they may contain additional</span>
+        <span class="c1"># members</span>
+        <span class="c1"># NOTE: this implementation will only follow simple IF statements</span>
+        <span class="c1"># with a call to the Parcel instance. All other cases can&#39;t be</span>
+        <span class="c1"># handled (at least not yet)</span>
+        <span class="n">cond</span><span class="p">:</span> <span class="n">ConditionDef</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compiler</span><span class="o">.</span><span class="n">parse_condition</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">tracker</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">cond</span><span class="p">:</span>
+            <span class="n">consequence</span> <span class="o">=</span> <span class="n">expr</span><span class="o">.</span><span class="n">child_by_field_name</span><span class="p">(</span><span class="s2">&quot;consequence&quot;</span><span class="p">)</span>
+            <span class="n">alternative</span> <span class="o">=</span> <span class="n">expr</span><span class="o">.</span><span class="n">child_by_field_name</span><span class="p">(</span><span class="s2">&quot;alternative&quot;</span><span class="p">)</span>
+            <span class="c1"># pylint: disable-next=protected-access</span>
+            <span class="n">cond</span><span class="o">.</span><span class="n">consequence</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compiler</span><span class="o">.</span><span class="n">_parse_parcelable_java</span><span class="p">(</span>
+                <span class="n">consequence</span><span class="o">.</span><span class="n">named_child</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">tracker</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">alternative</span><span class="p">:</span>
+                <span class="c1"># pylint: disable-next=protected-access</span>
+                <span class="n">cond</span><span class="o">.</span><span class="n">alternative</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compiler</span><span class="o">.</span><span class="n">_parse_parcelable_java</span><span class="p">(</span>
+                    <span class="n">alternative</span><span class="o">.</span><span class="n">named_child</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">tracker</span>
+                <span class="p">)</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="NodeVisitor.visit_method_invocation">
+<a class="viewcode-back" href="../../../api/compiler.html#bshark.compiler._compiler.NodeVisitor.visit_method_invocation">[docs]</a>
+    <span class="k">def</span> <span class="nf">visit_method_invocation</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">expr</span><span class="p">:</span> <span class="n">Node</span><span class="p">,</span> <span class="n">tracker</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">FieldDef</span><span class="p">]]:</span>
+        <span class="c1"># If this statement is a delegate, we have to first parse</span>
+        <span class="c1"># the invoked method.</span>
+        <span class="n">qualifier</span> <span class="o">=</span> <span class="n">txt</span><span class="p">(</span><span class="n">expr</span><span class="o">.</span><span class="n">child_by_field_name</span><span class="p">(</span><span class="s2">&quot;object&quot;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">qualifier</span> <span class="o">==</span> <span class="n">tracker</span><span class="p">:</span>
+            <span class="c1"># the statement is a call to the current Parcel</span>
+            <span class="c1"># object.</span>
+            <span class="n">call</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compiler</span><span class="o">.</span><span class="n">th</span><span class="o">.</span><span class="n">call_from_expr</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">tracker</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">FieldDef</span><span class="p">(</span><span class="n">tracker</span><span class="p">,</span> <span class="n">call</span><span class="p">)]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">compiler</span><span class="o">.</span><span class="n">is_delegate</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">tracker</span><span class="p">):</span>
+            <span class="c1"># We have two types of delegates:</span>
+            <span class="c1">#   1. Delegate parsing to antother parcelable</span>
+            <span class="c1">#   2. Delegate parsing to a local method</span>
+            <span class="k">if</span> <span class="n">qualifier</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># try to resolve the type of the delegate</span>
+                <span class="k">if</span> <span class="n">qualifier</span> <span class="o">==</span> <span class="s2">&quot;super&quot;</span><span class="p">:</span>
+                    <span class="c1"># call to super class</span>
+                    <span class="n">idef</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compiler</span><span class="o">.</span><span class="n">get_import</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">compiler</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">extends</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                    <span class="k">return</span> <span class="p">[</span><span class="n">FieldDef</span><span class="p">(</span><span class="s2">&quot;_super&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;readParcelable:</span><span class="si">{</span><span class="n">idef</span><span class="o">.</span><span class="n">qname</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)]</span>
+
+                <span class="n">member_ty</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compiler</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">members</span><span class="p">[</span><span class="n">qualifier</span><span class="p">]</span><span class="o">.</span><span class="n">child_by_field_name</span><span class="p">(</span>
+                    <span class="s2">&quot;type&quot;</span>
+                <span class="p">)</span>
+                <span class="n">call</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compiler</span><span class="o">.</span><span class="n">th</span><span class="o">.</span><span class="n">call_of</span><span class="p">(</span><span class="n">member_ty</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">compiler</span><span class="p">)</span>
+                <span class="k">return</span> <span class="p">[</span><span class="n">FieldDef</span><span class="p">(</span><span class="n">qualifier</span><span class="p">,</span> <span class="n">call</span><span class="p">)]</span>
+
+            <span class="n">method</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compiler</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">methods</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                <span class="n">txt</span><span class="p">(</span><span class="n">expr</span><span class="o">.</span><span class="n">child_by_field_name</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">))</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">method</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">method_tracker</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compiler</span><span class="o">.</span><span class="n">resolve_parcel_tracker</span><span class="p">(</span><span class="n">method</span><span class="p">)</span>
+                <span class="c1"># pylint: disable-next=protected-access</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">compiler</span><span class="o">.</span><span class="n">_parse_parcelable_java</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="n">method_tracker</span><span class="p">)</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="Compiler">
+<a class="viewcode-back" href="../../../api/compiler.html#bshark.compiler._compiler.Compiler">[docs]</a>
+<span class="k">class</span> <span class="nc">Compiler</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The _compiler_ class is used to translate given AIDL definitions into</span>
+<span class="sd">    a pre-defined structure that can be used to decode and potentially</span>
+<span class="sd">    encode data.</span>
+
+<span class="sd">    The internal processing depends on which type the underlying unit was</span>
+<span class="sd">    associated with. For instance, :code:`BINDER` declarations will result</span>
+<span class="sd">    in a different output than parsed :code:`PARCELABLE_JAVA` declarations.</span>
+
+<span class="sd">    In general, the compiler tries to describe what operations need to be</span>
+<span class="sd">    performed on a :class:`Unit` in order to decode or encode data. There</span>
+<span class="sd">    are predefined methods, which will be mapped to their Python equivalents:</span>
+
+<span class="sd">    .. list-table::</span>
+<span class="sd">        :header-rows: 1</span>
+<span class="sd">        :widths: 20 80</span>
+
+<span class="sd">        * - Method</span>
+<span class="sd">          - Python Type</span>
+<span class="sd">        * - readInt, readLong, readShort, readByte</span>
+<span class="sd">          - int</span>
+<span class="sd">        * - readBoolean</span>
+<span class="sd">          - bool</span>
+<span class="sd">        * - readString</span>
+<span class="sd">          - str (:code:`utf-16-le` codec)</span>
+<span class="sd">        * - readString8</span>
+<span class="sd">          - str (:code:`utf-8` codec)</span>
+<span class="sd">        * - readFloat, readDouble</span>
+<span class="sd">          - float</span>
+
+
+<span class="sd">    - Binder: All defined methods will be inspected and their parameters</span>
+<span class="sd">      will be translated according to the scheme introduced before.</span>
+
+<span class="sd">    :param unit: The unit to compile.</span>
+<span class="sd">    :type unit: Unit</span>
+<span class="sd">    :param loader: The :class:`BaseLoader` object to use.</span>
+<span class="sd">    :type loader: BaseLoader</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">unit</span><span class="p">:</span> <span class="n">Unit</span><span class="p">,</span>
+        <span class="n">loader</span><span class="p">:</span> <span class="n">BaseLoader</span><span class="p">,</span>
+        <span class="n">type_handler</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">TypeHandler</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">visitor_cls</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">Type</span><span class="p">[</span><span class="n">NodeVisitor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">loader</span> <span class="o">=</span> <span class="n">loader</span>
+        <span class="c1"># Calling the preprocessor will load defined members, methods and</span>
+        <span class="c1"># constructors of the unit.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">info</span> <span class="o">=</span> <span class="n">Preprocessor</span><span class="p">(</span><span class="n">unit</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">th</span> <span class="o">=</span> <span class="n">type_handler</span> <span class="ow">or</span> <span class="n">TypeHandler</span><span class="p">()</span>
+        <span class="c1"># internal private fields</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_imports</span> <span class="o">=</span> <span class="n">ImportDefList</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_visitor_ty</span> <span class="o">=</span> <span class="n">visitor_cls</span> <span class="ow">or</span> <span class="n">NodeVisitor</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">unit</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Unit</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the current unit.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">unit</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">resolved_imports</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ImportDefList</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the list of resolved imports.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_imports</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_imports</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_imports</span>
+
+<div class="viewcode-block" id="Compiler.compile">
+<a class="viewcode-back" href="../../../api/compiler.html#bshark.compiler._compiler.Compiler.compile">[docs]</a>
+    <span class="k">def</span> <span class="nf">compile</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BinderDef</span> <span class="o">|</span> <span class="n">ParcelableDef</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Compiles the stored unit. (if possible)&quot;&quot;&quot;</span>
+        <span class="n">definition</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">match</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">type</span><span class="p">:</span>
+            <span class="k">case</span> <span class="n">Type</span><span class="o">.</span><span class="n">PARCELABLE_JAVA</span><span class="p">:</span>
+                <span class="n">definition</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">as_parcelable</span><span class="p">()</span>
+            <span class="k">case</span> <span class="n">Type</span><span class="o">.</span><span class="n">BINDER</span><span class="p">:</span>
+                <span class="n">definition</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">as_binder</span><span class="p">()</span>
+            <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">type</span><span class="si">}</span><span class="s2"> is not a supported type&quot;</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">loader</span><span class="o">.</span><span class="n">ucache</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">qname</span><span class="p">]</span> <span class="o">=</span> <span class="n">definition</span>
+        <span class="k">return</span> <span class="n">definition</span></div>
+
+
+
+<div class="viewcode-block" id="Compiler.as_binder">
+<a class="viewcode-back" href="../../../api/compiler.html#bshark.compiler._compiler.Compiler.as_binder">[docs]</a>
+    <span class="k">def</span> <span class="nf">as_binder</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BinderDef</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the given unit as a :class:`BinderDef`.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">type</span> <span class="o">!=</span> <span class="n">Type</span><span class="o">.</span><span class="n">BINDER</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">type</span><span class="si">}</span><span class="s2"> is not a binder class&quot;</span><span class="p">)</span>
+
+        <span class="n">bdef</span> <span class="o">=</span> <span class="n">BinderDef</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">qname</span><span class="p">,</span> <span class="n">Type</span><span class="o">.</span><span class="n">BINDER</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="c1"># at first, we have to import all the referenced classes,</span>
+        <span class="c1"># because we need to know what type they are.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_imports</span><span class="p">()</span>
+        <span class="n">method_defs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">methods</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">method_decl</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">methods</span><span class="p">[</span><span class="n">name</span><span class="p">]</span>
+            <span class="n">rtype</span> <span class="o">=</span> <span class="n">method_decl</span><span class="o">.</span><span class="n">child_by_field_name</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">)</span>
+            <span class="n">is_oneway</span> <span class="o">=</span> <span class="n">rtype</span><span class="o">.</span><span class="n">text</span> <span class="o">==</span> <span class="sa">b</span><span class="s2">&quot;void&quot;</span>
+            <span class="c1"># NOTE: the method might not be oneway, BUT there may be arguments</span>
+            <span class="c1"># with the modifier &#39;out&#39;, which can be decoded as well.</span>
+            <span class="c1"># TODO: the transaction code might be different</span>
+            <span class="n">mdef</span> <span class="o">=</span> <span class="n">MethodDef</span><span class="p">(</span>
+                <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+                <span class="n">tc</span><span class="o">=</span><span class="n">i</span><span class="p">,</span>
+                <span class="n">oneway</span><span class="o">=</span><span class="n">is_oneway</span><span class="p">,</span>
+                <span class="n">retval</span><span class="o">=</span><span class="kc">None</span> <span class="k">if</span> <span class="n">is_oneway</span> <span class="k">else</span> <span class="p">[],</span>
+                <span class="n">arguments</span><span class="o">=</span><span class="p">[],</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">is_oneway</span><span class="p">:</span>
+                <span class="n">mdef</span><span class="o">.</span><span class="n">retval</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ReturnDef</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">th</span><span class="o">.</span><span class="n">call_of</span><span class="p">(</span><span class="n">rtype</span><span class="p">,</span> <span class="bp">self</span><span class="p">)))</span>
+
+            <span class="c1"># each parameter may store different modifiers, which will be</span>
+            <span class="c1"># expressed by the first unnamed node in the formal parameter</span>
+            <span class="c1"># declaration</span>
+            <span class="n">parameters</span> <span class="o">=</span> <span class="n">get_parameters</span><span class="p">(</span>
+                <span class="n">method_decl</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">lang</span><span class="p">,</span> <span class="s2">&quot;binder_formal_parameters&quot;</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">param_name</span><span class="p">,</span> <span class="n">param_decl</span> <span class="ow">in</span> <span class="n">parameters</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="c1"># The &#39;in&#39; modifier is inferred as default modifier</span>
+                <span class="n">param_modifier</span> <span class="o">=</span> <span class="n">get_parameter_modifier</span><span class="p">(</span><span class="n">param_decl</span><span class="p">)</span>
+                <span class="n">param_type</span> <span class="o">=</span> <span class="n">param_decl</span><span class="o">.</span><span class="n">child_by_field_name</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">)</span>
+                <span class="n">is_out</span> <span class="o">=</span> <span class="n">param_modifier</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;out&quot;</span><span class="p">,</span> <span class="s2">&quot;inout&quot;</span><span class="p">)</span>
+                <span class="n">pdef</span> <span class="o">=</span> <span class="n">ParameterDef</span><span class="p">(</span>
+                    <span class="n">name</span><span class="o">=</span><span class="n">param_name</span><span class="p">,</span>
+                    <span class="n">call</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">th</span><span class="o">.</span><span class="n">call_of</span><span class="p">(</span><span class="n">param_type</span><span class="p">,</span> <span class="bp">self</span><span class="p">),</span>
+                    <span class="n">direction</span><span class="o">=</span><span class="n">Direction</span><span class="p">[</span><span class="n">param_modifier</span><span class="o">.</span><span class="n">upper</span><span class="p">()],</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="n">is_out</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">is_oneway</span><span class="p">:</span>
+                        <span class="n">mdef</span><span class="o">.</span><span class="n">retval</span> <span class="o">=</span> <span class="p">[]</span>
+                    <span class="n">mdef</span><span class="o">.</span><span class="n">retval</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pdef</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">param_modifier</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;in&quot;</span><span class="p">,</span> <span class="s2">&quot;inout&quot;</span><span class="p">):</span>
+                    <span class="n">mdef</span><span class="o">.</span><span class="n">arguments</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pdef</span><span class="p">)</span>
+            <span class="n">method_defs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">mdef</span><span class="p">)</span>
+
+        <span class="n">bdef</span><span class="o">.</span><span class="n">methods</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">method_defs</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">tc</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">loader</span><span class="o">.</span><span class="n">ucache</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">qname</span><span class="p">]</span><span class="o">.</span><span class="n">body</span> <span class="o">=</span> <span class="n">bdef</span>
+        <span class="k">return</span> <span class="n">bdef</span></div>
+
+
+<div class="viewcode-block" id="Compiler.as_parcelable">
+<a class="viewcode-back" href="../../../api/compiler.html#bshark.compiler._compiler.Compiler.as_parcelable">[docs]</a>
+    <span class="k">def</span> <span class="nf">as_parcelable</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ParcelableDef</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the given unit as a :class:`ParcelableDef`.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="n">Type</span><span class="o">.</span><span class="n">PARCELABLE</span><span class="p">,</span> <span class="n">Type</span><span class="o">.</span><span class="n">PARCELABLE_JAVA</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">type</span><span class="si">}</span><span class="s2"> is not a parcelable class&quot;</span><span class="p">)</span>
+
+        <span class="n">pdef</span> <span class="o">=</span> <span class="n">ParcelableDef</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">qname</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">type</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_resolve_imports</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">Type</span><span class="o">.</span><span class="n">PARCELABLE_JAVA</span><span class="p">:</span>
+            <span class="c1"># We are using the CREATOR instance as our entry point</span>
+            <span class="c1"># and will follow all method calls from there.</span>
+            <span class="n">ctor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">get_parcel_constructor</span><span class="p">()</span>
+            <span class="n">creator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">get_creator</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">ctor</span> <span class="ow">or</span> <span class="n">creator</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">UnsupportedTypeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;No parcel constructor or creator found - </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">qname</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+
+            <span class="n">target</span> <span class="o">=</span> <span class="n">creator</span> <span class="ow">or</span> <span class="n">ctor</span>
+            <span class="n">tracker</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">resolve_parcel_tracker</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
+            <span class="n">pdef</span><span class="o">.</span><span class="n">fields</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_parcelable_java</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="n">tracker</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">pdef</span></div>
+
+
+    <span class="c1"># --- internal helpers ---</span>
+<div class="viewcode-block" id="Compiler.get_import">
+<a class="viewcode-back" href="../../../api/compiler.html#bshark.compiler._compiler.Compiler.get_import">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_import</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">qname</span><span class="p">:</span> <span class="n">QName</span> <span class="o">|</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ImportDef</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the import with the given qualified name (or tries to import it).&quot;&quot;&quot;</span>
+        <span class="n">idef</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_imports</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">qname</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">idef</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">idef</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">unit</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">loader</span><span class="o">.</span><span class="n">import_</span><span class="p">(</span><span class="n">qname</span><span class="p">):</span>
+                <span class="n">unit_qname</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">unit</span><span class="o">.</span><span class="n">package</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">unit</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="n">idef</span> <span class="o">=</span> <span class="n">ImportDef</span><span class="p">(</span><span class="n">qname</span><span class="p">,</span> <span class="n">unit</span><span class="o">.</span><span class="n">type</span><span class="p">,</span> <span class="n">unit</span><span class="p">)</span>
+                <span class="c1"># import all other units</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_imports</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">idef</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">unit_qname</span> <span class="o">==</span> <span class="n">qname</span><span class="p">:</span>
+                    <span class="k">break</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">ImportError</span><span class="p">,</span> <span class="ne">FileNotFoundError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+            <span class="c1"># try to search for inner classes</span>
+            <span class="n">scope</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">body</span>
+            <span class="n">cls_decl</span> <span class="o">=</span> <span class="n">get_class_by_name</span><span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="n">qname</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">lang</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">cls_decl</span><span class="p">:</span>
+                <span class="n">idef</span> <span class="o">=</span> <span class="n">ImportDef</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">qname</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">qname</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">Type</span><span class="o">.</span><span class="n">PARCELABLE_JAVA</span><span class="p">,</span> <span class="n">cls_decl</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">idef</span> <span class="o">=</span> <span class="n">ImportDef</span><span class="p">(</span><span class="n">qname</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_imports</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">idef</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">idef</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_resolve_imports</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Resolves all imports of the current unit.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_imports</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="c1"># 1. Import all specified types</span>
+        <span class="k">for</span> <span class="n">imp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">unit</span><span class="o">.</span><span class="n">imports</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">get_import</span><span class="p">(</span><span class="n">imp</span><span class="p">)</span>
+
+        <span class="c1"># 2. Import all classes in the current directory</span>
+        <span class="n">decl_qname</span> <span class="o">=</span> <span class="n">get_declaring_class</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">qname</span><span class="p">)</span>
+        <span class="n">package</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">decl_qname</span><span class="o">.</span><span class="n">rsplit</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="n">rel_dir_path</span> <span class="o">=</span> <span class="n">package</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="p">)</span>
+        <span class="n">abs_dir_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loader</span><span class="o">.</span><span class="n">to_absolute</span><span class="p">(</span><span class="n">rel_dir_path</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">abs_dir_path</span><span class="p">):</span>
+            <span class="n">name</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+            <span class="c1"># We will only import AIDL files</span>
+            <span class="k">if</span> <span class="n">ext</span> <span class="ow">in</span> <span class="p">(</span><span class="n">FULL_AIDL_EXT</span><span class="p">):</span>
+                <span class="n">qname</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">package</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">get_import</span><span class="p">(</span><span class="n">qname</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Compiler.resolve_parcel_tracker">
+<a class="viewcode-back" href="../../../api/compiler.html#bshark.compiler._compiler.Compiler.resolve_parcel_tracker">[docs]</a>
+    <span class="k">def</span> <span class="nf">resolve_parcel_tracker</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="n">Node</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Tries to retrieve the parameter name of the parcel argument&quot;&quot;&quot;</span>
+        <span class="n">parameters</span> <span class="o">=</span> <span class="n">get_parameters</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">lang</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Invalid number of parameters to resolve parcel tracker - got </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">parameters</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">parameters</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span></div>
+
+
+    <span class="c1"># --- parcelable java ---</span>
+    <span class="k">def</span> <span class="nf">_parse_parcelable_java</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">method</span><span class="p">:</span> <span class="n">Node</span><span class="p">,</span> <span class="n">tracker</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">t</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">FieldDef</span> <span class="o">|</span> <span class="n">ConditionDef</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Processes the given method declaration and returns a list of</span>
+<span class="sd">        all field definitions in the right order.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">members</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">visitor</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_visitor_ty</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="c1"># We iterate over all statements in the body and look out</span>
+        <span class="c1"># for delegations, assignments and local variables. The</span>
+        <span class="c1"># &#39;body&#39; of the method will always contain one child node,</span>
+        <span class="c1"># which then stores all the statements.</span>
+        <span class="k">if</span> <span class="n">method</span><span class="o">.</span><span class="n">type</span> <span class="o">!=</span> <span class="n">Constants</span><span class="o">.</span><span class="n">BLOCK</span><span class="p">:</span>
+            <span class="n">body</span> <span class="o">=</span> <span class="n">method</span><span class="o">.</span><span class="n">child_by_field_name</span><span class="p">(</span><span class="s2">&quot;body&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">body</span><span class="p">:</span>
+                <span class="c1"># But if there are no statements in the body, we can</span>
+                <span class="c1"># simply return an empty list</span>
+                <span class="k">return</span> <span class="n">members</span>
+
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">statement</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">body</span><span class="o">.</span><span class="n">named_children</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">statement</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">Constants</span><span class="o">.</span><span class="n">EXPR_STATEMENT</span><span class="p">:</span>
+                <span class="n">expr</span> <span class="o">=</span> <span class="n">statement</span><span class="o">.</span><span class="n">named_child</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">expr</span> <span class="o">=</span> <span class="n">statement</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">members</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">visitor</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">expr</span><span class="p">,</span> <span class="n">tracker</span><span class="p">,</span> <span class="n">idx</span><span class="p">))</span>
+            <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+                <span class="n">members</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Stop</span><span class="p">())</span>
+                <span class="k">break</span>
+
+        <span class="k">return</span> <span class="n">members</span>
+
+<div class="viewcode-block" id="Compiler.is_target_assignment">
+<a class="viewcode-back" href="../../../api/compiler.html#bshark.compiler._compiler.Compiler.is_target_assignment">[docs]</a>
+    <span class="k">def</span> <span class="nf">is_target_assignment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expr</span><span class="p">:</span> <span class="n">Node</span><span class="p">,</span> <span class="n">tracker</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if an expression is an assignment with the tracker.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">expr</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">Constants</span><span class="o">.</span><span class="n">ASSIGNMENT_EXPR</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="c1"># The left operand must point to a member and the right</span>
+        <span class="c1"># must be a method invocation.</span>
+        <span class="n">left</span> <span class="o">=</span> <span class="n">expr</span><span class="o">.</span><span class="n">named_child</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">right</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_method_call</span><span class="p">(</span><span class="n">expr</span><span class="o">.</span><span class="n">named_child</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">tracker</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">right</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="c1"># TODO: handle cast_expression</span>
+        <span class="k">if</span> <span class="n">right</span><span class="o">.</span><span class="n">type</span> <span class="o">!=</span> <span class="n">Constants</span><span class="o">.</span><span class="n">METHOD_CALL</span> <span class="ow">or</span> <span class="n">left</span><span class="o">.</span><span class="n">type</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span>
+            <span class="n">Constants</span><span class="o">.</span><span class="n">FIELD_ACCESS</span><span class="p">,</span>
+            <span class="n">Constants</span><span class="o">.</span><span class="n">IDENTIFIER</span><span class="p">,</span>
+        <span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="c1"># The left operand must point to a member</span>
+        <span class="k">if</span> <span class="n">left</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">Constants</span><span class="o">.</span><span class="n">IDENTIFIER</span><span class="p">:</span>
+            <span class="n">member_name</span> <span class="o">=</span> <span class="n">txt</span><span class="p">(</span><span class="n">left</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">member_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">members</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">member_name</span> <span class="o">=</span> <span class="n">txt</span><span class="p">(</span><span class="n">left</span><span class="o">.</span><span class="n">named_child</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="n">left</span><span class="o">.</span><span class="n">named_child</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">type</span> <span class="o">!=</span> <span class="s2">&quot;this&quot;</span>
+                <span class="ow">and</span> <span class="n">member_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">members</span>
+            <span class="p">):</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="c1"># the assignment may be a call to another CREATOR, therefore</span>
+        <span class="c1"># the qualifier or first parameter can be the value of the</span>
+        <span class="c1"># tracker.</span>
+        <span class="k">if</span> <span class="n">txt</span><span class="p">(</span><span class="n">right</span><span class="o">.</span><span class="n">child_by_field_name</span><span class="p">(</span><span class="s2">&quot;object&quot;</span><span class="p">))</span> <span class="o">==</span> <span class="n">tracker</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="n">args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_invocation_arguments</span><span class="p">(</span><span class="n">right</span><span class="o">.</span><span class="n">child_by_field_name</span><span class="p">(</span><span class="s2">&quot;arguments&quot;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">tracker</span> <span class="ow">in</span> <span class="n">args</span></div>
+
+
+<div class="viewcode-block" id="Compiler.get_invocation_arguments">
+<a class="viewcode-back" href="../../../api/compiler.html#bshark.compiler._compiler.Compiler.get_invocation_arguments">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_invocation_arguments</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">invocation</span><span class="p">:</span> <span class="n">Node</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">t</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">invocation</span><span class="o">.</span><span class="n">named_children</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="Compiler.get_assigned_member">
+<a class="viewcode-back" href="../../../api/compiler.html#bshark.compiler._compiler.Compiler.get_assigned_member">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_assigned_member</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expr</span><span class="p">:</span> <span class="n">Node</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns the name of the member that is assigned to.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">assert</span> <span class="n">expr</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">Constants</span><span class="o">.</span><span class="n">ASSIGNMENT_EXPR</span>
+        <span class="c1"># The left operand must point to a member</span>
+        <span class="n">left</span> <span class="o">=</span> <span class="n">expr</span><span class="o">.</span><span class="n">named_child</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">left</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">Constants</span><span class="o">.</span><span class="n">IDENTIFIER</span><span class="p">:</span>
+            <span class="n">field_name</span> <span class="o">=</span> <span class="n">txt</span><span class="p">(</span><span class="n">left</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">field_name</span> <span class="o">=</span> <span class="n">left</span><span class="o">.</span><span class="n">child_by_field_name</span><span class="p">(</span><span class="s2">&quot;field&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">field_name</span> <span class="k">if</span> <span class="n">field_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">members</span> <span class="k">else</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="Compiler.parse_condition">
+<a class="viewcode-back" href="../../../api/compiler.html#bshark.compiler._compiler.Compiler.parse_condition">[docs]</a>
+    <span class="k">def</span> <span class="nf">parse_condition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expr</span><span class="p">:</span> <span class="n">Node</span><span class="p">,</span> <span class="n">tracker</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">ConditionDef</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Parse an if statement and return a condition definition.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">expr</span><span class="o">.</span><span class="n">type</span> <span class="o">!=</span> <span class="n">Constants</span><span class="o">.</span><span class="n">IF_STATEMENT</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">condition</span> <span class="o">=</span> <span class="n">expr</span><span class="o">.</span><span class="n">named_child</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">condition_expr</span> <span class="o">=</span> <span class="n">condition</span><span class="o">.</span><span class="n">named_child</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="c1"># Currently, only binary expressions are accepted</span>
+        <span class="k">if</span> <span class="n">condition_expr</span><span class="o">.</span><span class="n">type</span> <span class="o">!=</span> <span class="n">Constants</span><span class="o">.</span><span class="n">PARENTHESIZED_EXPR</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">binary_expr</span> <span class="o">=</span> <span class="n">condition_expr</span><span class="o">.</span><span class="n">named_child</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">binary_expr</span><span class="o">.</span><span class="n">type</span> <span class="o">!=</span> <span class="n">Constants</span><span class="o">.</span><span class="n">BINARY_EXPR</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="n">left</span> <span class="o">=</span> <span class="n">binary_expr</span><span class="o">.</span><span class="n">named_child</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">right</span> <span class="o">=</span> <span class="n">binary_expr</span><span class="o">.</span><span class="n">named_child</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="p">[</span><span class="n">left</span><span class="p">,</span> <span class="n">right</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">child</span><span class="o">.</span><span class="n">type</span> <span class="o">!=</span> <span class="n">Constants</span><span class="o">.</span><span class="n">METHOD_CALL</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="n">qualifier</span> <span class="o">=</span> <span class="n">txt</span><span class="p">(</span><span class="n">child</span><span class="o">.</span><span class="n">child_by_field_name</span><span class="p">(</span><span class="s2">&quot;object&quot;</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">qualifier</span> <span class="o">!=</span> <span class="n">tracker</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="n">const_val</span> <span class="o">=</span> <span class="n">left</span> <span class="k">if</span> <span class="n">child</span> <span class="ow">is</span> <span class="n">right</span> <span class="k">else</span> <span class="n">right</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">txt</span><span class="p">(</span><span class="n">const_val</span><span class="o">.</span><span class="n">child_by_field_name</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">ConditionDef</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">th</span><span class="o">.</span><span class="n">const_val_of</span><span class="p">(</span><span class="n">const_val</span><span class="p">,</span> <span class="bp">self</span><span class="p">),</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="Compiler.is_delegate">
+<a class="viewcode-back" href="../../../api/compiler.html#bshark.compiler._compiler.Compiler.is_delegate">[docs]</a>
+    <span class="k">def</span> <span class="nf">is_delegate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expr</span><span class="p">:</span> <span class="n">Node</span><span class="p">,</span> <span class="n">tracker</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if a method is a delegate to another internal method (not constructor)&quot;&quot;&quot;</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_invocation_arguments</span><span class="p">(</span><span class="n">expr</span><span class="o">.</span><span class="n">child_by_field_name</span><span class="p">(</span><span class="s2">&quot;arguments&quot;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">tracker</span></div>
+
+
+<div class="viewcode-block" id="Compiler.get_method_call">
+<a class="viewcode-back" href="../../../api/compiler.html#bshark.compiler._compiler.Compiler.get_method_call">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_method_call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expr</span><span class="p">:</span> <span class="n">Node</span><span class="p">,</span> <span class="n">tracker</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="n">Node</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Tries to resolve a method invocation node from the given start node.&quot;&quot;&quot;</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">lang</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">Constants</span><span class="o">.</span><span class="n">METHOD_CALL</span><span class="si">}</span><span class="s2">) @func&quot;</span><span class="p">)</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">captures</span><span class="p">(</span><span class="n">expr</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">invocation</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">txt</span><span class="p">(</span><span class="n">invocation</span><span class="o">.</span><span class="n">child_by_field_name</span><span class="p">(</span><span class="s2">&quot;object&quot;</span><span class="p">))</span> <span class="o">==</span> <span class="n">tracker</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">invocation</span>
+
+            <span class="n">raw_args</span> <span class="o">=</span> <span class="n">invocation</span><span class="o">.</span><span class="n">child_by_field_name</span><span class="p">(</span><span class="s2">&quot;arguments&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">raw_args</span> <span class="ow">and</span> <span class="n">tracker</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_invocation_arguments</span><span class="p">(</span><span class="n">raw_args</span><span class="p">):</span>
+                <span class="k">return</span> <span class="n">invocation</span>
+
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="Compiler.is_local_assignment">
+<a class="viewcode-back" href="../../../api/compiler.html#bshark.compiler._compiler.Compiler.is_local_assignment">[docs]</a>
+    <span class="k">def</span> <span class="nf">is_local_assignment</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expr</span><span class="p">:</span> <span class="n">Node</span><span class="p">,</span> <span class="n">tracker</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if an expression is a local assignment with the tracker.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">expr</span><span class="o">.</span><span class="n">type</span> <span class="o">!=</span> <span class="n">Constants</span><span class="o">.</span><span class="n">LOCAL_VAR_DECL</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="c1"># The left operand must point to a member and the right</span>
+        <span class="c1"># must be a method invocation.</span>
+        <span class="n">declarator</span> <span class="o">=</span> <span class="n">expr</span><span class="o">.</span><span class="n">named_child</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">method</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_method_call</span><span class="p">(</span><span class="n">declarator</span><span class="p">,</span> <span class="n">tracker</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">method</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+        <span class="c1"># the assignment may be a call to another CREATOR, therefore</span>
+        <span class="c1"># the qualifier or first parameter can be the value of the</span>
+        <span class="c1"># tracker.</span>
+        <span class="k">if</span> <span class="n">txt</span><span class="p">(</span><span class="n">method</span><span class="o">.</span><span class="n">child_by_field_name</span><span class="p">(</span><span class="s2">&quot;object&quot;</span><span class="p">))</span> <span class="o">==</span> <span class="n">tracker</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="n">args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_invocation_arguments</span><span class="p">(</span><span class="n">method</span><span class="o">.</span><span class="n">child_by_field_name</span><span class="p">(</span><span class="s2">&quot;arguments&quot;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">tracker</span> <span class="ow">in</span> <span class="n">args</span></div>
+
+
+<div class="viewcode-block" id="Compiler.get_local_member">
+<a class="viewcode-back" href="../../../api/compiler.html#bshark.compiler._compiler.Compiler.get_local_member">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_local_member</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">expr</span><span class="p">:</span> <span class="n">Node</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">t</span><span class="o">.</span><span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Returns the name of the member that is assigned to.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">expr</span><span class="o">.</span><span class="n">type</span> <span class="o">!=</span> <span class="n">Constants</span><span class="o">.</span><span class="n">LOCAL_VAR_DECL</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="k">return</span> <span class="n">txt</span><span class="p">(</span><span class="n">expr</span><span class="o">.</span><span class="n">named_child</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">named_child</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="Compiler.trace_local">
+<a class="viewcode-back" href="../../../api/compiler.html#bshark.compiler._compiler.Compiler.trace_local">[docs]</a>
+    <span class="k">def</span> <span class="nf">trace_local</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">body</span><span class="p">:</span> <span class="n">Node</span><span class="p">,</span> <span class="n">tracker</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">lang</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">Constants</span><span class="o">.</span><span class="n">ASSIGNMENT_EXPR</span><span class="si">}</span><span class="s2">) @assignment&quot;</span><span class="p">)</span>
+        <span class="n">query2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">info</span><span class="o">.</span><span class="n">lang</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">Constants</span><span class="o">.</span><span class="n">IDENTIFIER</span><span class="si">}</span><span class="s2">) @field&quot;</span><span class="p">)</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">captures</span><span class="p">(</span><span class="n">body</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">assignment</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">identifier</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">query2</span><span class="o">.</span><span class="n">captures</span><span class="p">(</span><span class="n">assignment</span><span class="o">.</span><span class="n">named_child</span><span class="p">(</span><span class="mi">1</span><span class="p">)):</span>
+                <span class="k">if</span> <span class="n">txt</span><span class="p">(</span><span class="n">identifier</span><span class="p">)</span> <span class="o">==</span> <span class="n">tracker</span><span class="p">:</span>
+                    <span class="n">field</span> <span class="o">=</span> <span class="n">assignment</span><span class="o">.</span><span class="n">named_child</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">field</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="n">Constants</span><span class="o">.</span><span class="n">FIELD_ACCESS</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="n">txt</span><span class="p">(</span><span class="n">field</span><span class="o">.</span><span class="n">child_by_field_name</span><span class="p">(</span><span class="s2">&quot;field&quot;</span><span class="p">))</span>
+                    <span class="k">return</span> <span class="n">txt</span><span class="p">(</span><span class="n">field</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">tracker</span></div>
+</div>
+
+</pre></div>
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="../../../_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="../../../_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2024, MatrixEditor.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.2.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>

@@ -1,0 +1,881 @@
+
+<!DOCTYPE html>
+
+
+<html lang="en" data-content_root="./" >
+
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Index &#8212; bshark 0.1-beta documentation</title>
+  
+  
+  
+  <script data-cfasync="false">
+    document.documentElement.dataset.mode = localStorage.getItem("mode") || "";
+    document.documentElement.dataset.theme = localStorage.getItem("theme") || "light";
+  </script>
+  
+  <!-- Loaded before other Sphinx assets -->
+  <link href="_static/styles/theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="_static/styles/bootstrap.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+<link href="_static/styles/pydata-sphinx-theme.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+
+  
+  <link href="_static/vendor/fontawesome/6.5.1/css/all.min.css?digest=8d27b9dea8ad943066ae" rel="stylesheet" />
+  <link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.1/webfonts/fa-solid-900.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.1/webfonts/fa-brands-400.woff2" />
+<link rel="preload" as="font" type="font/woff2" crossorigin href="_static/vendor/fontawesome/6.5.1/webfonts/fa-regular-400.woff2" />
+
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/design-style.1e8bd061cd6da7fc9cf755528e8ffc24.min.css?v=0a3b3ea7" />
+  
+  <!-- Pre-loaded scripts that we'll load fully later -->
+  <link rel="preload" as="script" href="_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae" />
+<link rel="preload" as="script" href="_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae" />
+  <script src="_static/vendor/fontawesome/6.5.1/js/all.min.js?digest=8d27b9dea8ad943066ae"></script>
+
+    <script src="_static/documentation_options.js?v=91ca89c4"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="_static/design-tabs.js?v=36754332"></script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'genindex';</script>
+    <link rel="icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="#" />
+    <link rel="search" title="Search" href="search.html" />
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="docsearch:language" content="en"/>
+  </head>
+  
+  
+  <body data-bs-spy="scroll" data-bs-target=".bd-toc-nav" data-offset="180" data-bs-root-margin="0px 0px -60%" data-default-mode="">
+
+  
+  
+  <a id="pst-skip-link" class="skip-link" href="#main-content">Skip to main content</a>
+  
+  <div id="pst-scroll-pixel-helper"></div>
+  
+  <button type="button" class="btn rounded-pill" id="pst-back-to-top">
+    <i class="fa-solid fa-arrow-up"></i>
+    Back to top
+  </button>
+
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__primary"
+          id="__primary"/>
+  <label class="overlay overlay-primary" for="__primary"></label>
+  
+  <input type="checkbox"
+          class="sidebar-toggle"
+          name="__secondary"
+          id="__secondary"/>
+  <label class="overlay overlay-secondary" for="__secondary"></label>
+  
+  <div class="search-button__wrapper">
+    <div class="search-button__overlay"></div>
+    <div class="search-button__search-container">
+<form class="bd-search d-flex align-items-center"
+      action="search.html"
+      method="get">
+  <i class="fa-solid fa-magnifying-glass"></i>
+  <input type="search"
+         class="form-control"
+         name="q"
+         id="search-input"
+         placeholder="Search the docs ..."
+         aria-label="Search the docs ..."
+         autocomplete="off"
+         autocorrect="off"
+         autocapitalize="off"
+         spellcheck="false"/>
+  <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd>K</kbd></span>
+</form></div>
+  </div>
+  
+    <header class="bd-header navbar navbar-expand-lg bd-navbar">
+<div class="bd-header__inner bd-page-width">
+  <label class="sidebar-toggle primary-toggle" for="__primary">
+    <span class="fa-solid fa-bars"></span>
+  </label>
+  
+  
+  <div class="col-lg-3 navbar-header-items__start">
+    
+      <div class="navbar-item">
+
+  
+
+<a class="navbar-brand logo" href="index.html">
+  
+  
+  
+  
+  
+    
+    
+      
+    
+    
+    <img src="_static/favicon.ico" class="logo__image only-light" alt=""/>
+    <script>document.write(`<img src="_static/favicon.ico" class="logo__image only-dark" alt=""/>`);</script>
+  
+  
+    <p class="title logo__title">bshark</p>
+  
+</a></div>
+    
+  </div>
+  
+  <div class="col-lg-9 navbar-header-items">
+    
+    <div class="me-auto navbar-header-items__center">
+      
+        <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="cmd.html">
+                        CLI Reference and Usage
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="api/index.html">
+                        Library Internals
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+      
+    </div>
+    
+    
+    <div class="navbar-header-items__end">
+      
+        <div class="navbar-item navbar-persistent--container">
+          
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+        </div>
+      
+      
+        <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/MatrixEditor/bshark" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+      
+        <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+      
+    </div>
+    
+  </div>
+  
+  
+    <div class="navbar-persistent--mobile">
+
+ <script>
+ document.write(`
+   <button class="btn navbar-btn search-button-field search-button__button" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <span class="search-button__default-text">Search</span>
+    <span class="search-button__kbd-shortcut"><kbd class="kbd-shortcut__modifier">Ctrl</kbd>+<kbd class="kbd-shortcut__modifier">K</kbd></span>
+   </button>
+ `);
+ </script>
+    </div>
+  
+
+  
+</div>
+
+    </header>
+  
+
+  <div class="bd-container">
+    <div class="bd-container__inner bd-page-width">
+      
+      
+      
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
+        
+
+  
+  <div class="sidebar-header-items sidebar-primary__section">
+    
+    
+      <div class="sidebar-header-items__center">
+        
+          <div class="navbar-item">
+<nav class="navbar-nav">
+  <ul class="bd-navbar-elements navbar-nav">
+    
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="cmd.html">
+                        CLI Reference and Usage
+                      </a>
+                    </li>
+                
+
+                    <li class="nav-item">
+                      <a class="nav-link nav-internal" href="api/index.html">
+                        Library Internals
+                      </a>
+                    </li>
+                
+  </ul>
+</nav></div>
+        
+      </div>
+    
+    
+    
+      <div class="sidebar-header-items__end">
+        
+          <div class="navbar-item"><ul class="navbar-icon-links navbar-nav"
+    aria-label="Icon Links">
+        <li class="nav-item">
+          
+          
+          
+          
+          
+          
+          
+          
+          <a href="https://github.com/MatrixEditor/bshark" title="GitHub" class="nav-link" rel="noopener" target="_blank" data-bs-toggle="tooltip" data-bs-placement="bottom"><span><i class="fa-brands fa-square-github fa-lg" aria-hidden="true"></i></span>
+            <span class="sr-only">GitHub</span></a>
+        </li>
+</ul></div>
+        
+          <div class="navbar-item">
+
+<script>
+document.write(`
+  <button class="btn btn-sm navbar-btn theme-switch-button" title="light/dark" aria-label="light/dark" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="theme-switch nav-link" data-mode="light"><i class="fa-solid fa-sun fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="dark"><i class="fa-solid fa-moon fa-lg"></i></span>
+    <span class="theme-switch nav-link" data-mode="auto"><i class="fa-solid fa-circle-half-stroke fa-lg"></i></span>
+  </button>
+`);
+</script></div>
+        
+      </div>
+    
+  </div>
+  
+  
+  <div class="sidebar-primary-items__end sidebar-primary__section">
+  </div>
+  
+  <div id="rtd-footer-container"></div>
+
+
+      </div>
+      
+      <main id="main-content" class="bd-main">
+        
+        
+          <div class="bd-content">
+            <div class="bd-article-container">
+              
+              <div class="bd-header-article"></div>
+              
+              
+              
+                
+<div id="searchbox"></div>
+                <article class="bd-article">
+                  
+
+<h1 id="index">Index</h1>
+
+<div class="genindex-jumpbox">
+ <a href="#A"><strong>A</strong></a>
+ | <a href="#B"><strong>B</strong></a>
+ | <a href="#C"><strong>C</strong></a>
+ | <a href="#D"><strong>D</strong></a>
+ | <a href="#F"><strong>F</strong></a>
+ | <a href="#G"><strong>G</strong></a>
+ | <a href="#I"><strong>I</strong></a>
+ | <a href="#J"><strong>J</strong></a>
+ | <a href="#L"><strong>L</strong></a>
+ | <a href="#M"><strong>M</strong></a>
+ | <a href="#N"><strong>N</strong></a>
+ | <a href="#O"><strong>O</strong></a>
+ | <a href="#P"><strong>P</strong></a>
+ | <a href="#Q"><strong>Q</strong></a>
+ | <a href="#R"><strong>R</strong></a>
+ | <a href="#S"><strong>S</strong></a>
+ | <a href="#T"><strong>T</strong></a>
+ | <a href="#U"><strong>U</strong></a>
+ | <a href="#V"><strong>V</strong></a>
+ 
+</div>
+<h2 id="A">A</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/compilermodel.html#bshark.compiler.model.ABSPath">ABSPath (bshark.compiler.model attribute)</a>
+</li>
+      <li><a href="api/aidl.html#bshark.aidl.AIDL">AIDL (bshark.aidl attribute)</a>
+</li>
+      <li><a href="api/compilermodel.html#bshark.compiler.model.ConditionDef.alternative">alternative (bshark.compiler.model.ConditionDef attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/compilermodel.html#bshark.compiler.model.MethodDef.arguments">arguments (bshark.compiler.model.MethodDef attribute)</a>
+</li>
+      <li><a href="api/compiler.html#bshark.compiler._compiler.Compiler.as_binder">as_binder() (bshark.compiler._compiler.Compiler method)</a>
+</li>
+      <li><a href="api/compiler.html#bshark.compiler._compiler.Compiler.as_parcelable">as_parcelable() (bshark.compiler._compiler.Compiler method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="B">B</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/loader.html#bshark.compiler.BaseLoader">BaseLoader (class in bshark.compiler)</a>
+</li>
+      <li><a href="api/aidl.html#bshark.aidl.Type.BINDER">BINDER (bshark.aidl.Type attribute)</a>
+</li>
+      <li><a href="api/compilermodel.html#bshark.compiler.model.BinderDef">BinderDef (class in bshark.compiler.model)</a>
+</li>
+      <li><a href="api/aidl.html#bshark.aidl.Unit.body">body (bshark.aidl.Unit attribute)</a>
+</li>
+      <li>
+    bshark.aidl
+
+      <ul>
+        <li><a href="api/aidl.html#module-bshark.aidl">module</a>
+</li>
+      </ul></li>
+      <li>
+    bshark.compiler
+
+      <ul>
+        <li><a href="api/compiler.html#module-bshark.compiler">module</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    bshark.compiler.loader
+
+      <ul>
+        <li><a href="api/loader.html#module-bshark.compiler.loader">module</a>
+</li>
+      </ul></li>
+      <li>
+    bshark.compiler.model
+
+      <ul>
+        <li><a href="api/compilermodel.html#module-bshark.compiler.model">module</a>
+</li>
+      </ul></li>
+      <li>
+    bshark.compiler.util
+
+      <ul>
+        <li><a href="api/compilerutilities.html#module-bshark.compiler.util">module</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="C">C</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/compilermodel.html#bshark.compiler.model.ConditionDef.call">call (bshark.compiler.model.ConditionDef attribute)</a>
+
+      <ul>
+        <li><a href="api/compilermodel.html#bshark.compiler.model.FieldDef.call">(bshark.compiler.model.FieldDef attribute)</a>
+</li>
+        <li><a href="api/compilermodel.html#bshark.compiler.model.ParameterDef.call">(bshark.compiler.model.ParameterDef attribute)</a>
+</li>
+        <li><a href="api/compilermodel.html#bshark.compiler.model.ReturnDef.call">(bshark.compiler.model.ReturnDef attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="api/compiler.html#bshark.compiler._compiler.TypeHandler.call_from_expr">call_from_expr() (bshark.compiler._compiler.TypeHandler method)</a>
+</li>
+      <li><a href="api/compiler.html#bshark.compiler._compiler.TypeHandler.call_of">call_of() (bshark.compiler._compiler.TypeHandler method)</a>
+</li>
+      <li><a href="api/compilermodel.html#bshark.compiler.model.ConditionDef.check">check (bshark.compiler.model.ConditionDef attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/compilermodel.html#bshark.compiler.model.ClassDef">ClassDef (class in bshark.compiler.model)</a>
+</li>
+      <li><a href="api/compiler.html#bshark.compiler._compiler.Compiler.compile">compile() (bshark.compiler._compiler.Compiler method)</a>
+</li>
+      <li><a href="api/compiler.html#bshark.compiler._compiler.Compiler">Compiler (class in bshark.compiler._compiler)</a>
+</li>
+      <li><a href="api/compilermodel.html#bshark.compiler.model.Complex">Complex (class in bshark.compiler.model)</a>
+</li>
+      <li><a href="api/compilermodel.html#bshark.compiler.model.ConditionDef">ConditionDef (class in bshark.compiler.model)</a>
+</li>
+      <li><a href="api/compilermodel.html#bshark.compiler.model.ConditionDef.consequence">consequence (bshark.compiler.model.ConditionDef attribute)</a>
+</li>
+      <li><a href="api/compiler.html#bshark.compiler._compiler.TypeHandler.const_val_of">const_val_of() (bshark.compiler._compiler.TypeHandler method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="D">D</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/compiler.html#bshark.compiler._compiler.Preprocessor.declared_class">declared_class (bshark.compiler._compiler.Preprocessor property)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/compilermodel.html#bshark.compiler.model.ParameterDef.direction">direction (bshark.compiler.model.ParameterDef attribute)</a>
+</li>
+      <li><a href="api/compilermodel.html#bshark.compiler.model.Direction">Direction (class in bshark.compiler.model)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="F">F</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/compilermodel.html#bshark.compiler.model.FieldDef">FieldDef (class in bshark.compiler.model)</a>
+</li>
+      <li><a href="api/compilermodel.html#bshark.compiler.model.ParcelableDef.fields">fields (bshark.compiler.model.ParcelableDef attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/compilermodel.html#bshark.compiler.model.ImportDef.file_type">file_type (bshark.compiler.model.ImportDef attribute)</a>
+</li>
+      <li><a href="api/compilerutilities.html#bshark.compiler.util.filteraidl">filteraidl() (in module bshark.compiler.util)</a>
+</li>
+      <li><a href="api/compilermodel.html#bshark.compiler.model.from_json">from_json() (in module bshark.compiler.model)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="G">G</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/compilermodel.html#bshark.compiler.model.ImportDefList.get">get() (bshark.compiler.model.ImportDefList method)</a>
+</li>
+      <li><a href="api/compiler.html#bshark.compiler._compiler.Compiler.get_assigned_member">get_assigned_member() (bshark.compiler._compiler.Compiler method)</a>
+</li>
+      <li><a href="api/aidl.html#bshark.aidl.get_binder_methods">get_binder_methods() (in module bshark.aidl)</a>
+</li>
+      <li><a href="api/aidl.html#bshark.aidl.get_class_by_name">get_class_by_name() (in module bshark.aidl)</a>
+</li>
+      <li><a href="api/compiler.html#bshark.compiler._compiler.Preprocessor.get_creator">get_creator() (bshark.compiler._compiler.Preprocessor method)</a>
+</li>
+      <li><a href="api/compilerutilities.html#bshark.compiler.util.get_declaring_class">get_declaring_class() (in module bshark.compiler.util)</a>
+</li>
+      <li><a href="api/compiler.html#bshark.compiler._compiler.Compiler.get_import">get_import() (bshark.compiler._compiler.Compiler method)</a>
+</li>
+      <li><a href="api/aidl.html#bshark.aidl.get_imports">get_imports() (in module bshark.aidl)</a>
+</li>
+      <li><a href="api/compiler.html#bshark.compiler._compiler.Compiler.get_invocation_arguments">get_invocation_arguments() (bshark.compiler._compiler.Compiler method)</a>
+</li>
+      <li><a href="api/compiler.html#bshark.compiler._compiler.Compiler.get_local_member">get_local_member() (bshark.compiler._compiler.Compiler method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/aidl.html#bshark.aidl.get_method_by_name">get_method_by_name() (in module bshark.aidl)</a>
+</li>
+      <li><a href="api/compiler.html#bshark.compiler._compiler.Compiler.get_method_call">get_method_call() (bshark.compiler._compiler.Compiler method)</a>
+</li>
+      <li><a href="api/aidl.html#bshark.aidl.get_method_return_type">get_method_return_type() (in module bshark.aidl)</a>
+</li>
+      <li><a href="api/aidl.html#bshark.aidl.get_methods">get_methods() (in module bshark.aidl)</a>
+</li>
+      <li><a href="api/aidl.html#bshark.aidl.get_package">get_package() (in module bshark.aidl)</a>
+</li>
+      <li><a href="api/aidl.html#bshark.aidl.get_parameter_modifier">get_parameter_modifier() (in module bshark.aidl)</a>
+</li>
+      <li><a href="api/aidl.html#bshark.aidl.get_parameters">get_parameters() (in module bshark.aidl)</a>
+</li>
+      <li><a href="api/compiler.html#bshark.compiler._compiler.Preprocessor.get_parcel_constructor">get_parcel_constructor() (bshark.compiler._compiler.Preprocessor method)</a>
+</li>
+      <li><a href="api/aidl.html#bshark.aidl.get_parcelables">get_parcelables() (in module bshark.aidl)</a>
+</li>
+      <li><a href="api/compilerutilities.html#bshark.compiler.util.get_qname">get_qname() (in module bshark.compiler.util)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="I">I</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/loader.html#bshark.compiler.BaseLoader.import_">import_() (bshark.compiler.BaseLoader method)</a>
+</li>
+      <li><a href="api/compilermodel.html#bshark.compiler.model.ImportDef">ImportDef (class in bshark.compiler.model)</a>
+</li>
+      <li><a href="api/compilermodel.html#bshark.compiler.model.ImportDefList">ImportDefList (class in bshark.compiler.model)</a>
+</li>
+      <li><a href="api/aidl.html#bshark.aidl.Unit.imports">imports (bshark.aidl.Unit attribute)</a>
+</li>
+      <li><a href="api/compilermodel.html#bshark.compiler.model.Direction.IN">IN (bshark.compiler.model.Direction attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/compilermodel.html#bshark.compiler.model.Direction.INOUT">INOUT (bshark.compiler.model.Direction attribute)</a>
+</li>
+      <li><a href="api/compiler.html#bshark.compiler._compiler.Preprocessor.is_compiled">is_compiled() (bshark.compiler._compiler.Preprocessor method)</a>
+</li>
+      <li><a href="api/compiler.html#bshark.compiler._compiler.Compiler.is_delegate">is_delegate() (bshark.compiler._compiler.Compiler method)</a>
+</li>
+      <li><a href="api/compiler.html#bshark.compiler._compiler.Compiler.is_local_assignment">is_local_assignment() (bshark.compiler._compiler.Compiler method)</a>
+</li>
+      <li><a href="api/compiler.html#bshark.compiler._compiler.Compiler.is_target_assignment">is_target_assignment() (bshark.compiler._compiler.Compiler method)</a>
+</li>
+      <li><a href="api/compiler.html#bshark.compiler._compiler.Preprocessor.is_valid">is_valid() (bshark.compiler._compiler.Preprocessor method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="J">J</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/aidl.html#bshark.aidl.JAVA">JAVA (bshark.aidl attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="L">L</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/compiler.html#bshark.compiler._compiler.Preprocessor.lang">lang (bshark.compiler._compiler.Preprocessor property)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/loader.html#bshark.compiler.BaseLoader.load_aidl">load_aidl() (bshark.compiler.BaseLoader method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="M">M</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/compilermodel.html#bshark.compiler.model.MethodDef">MethodDef (class in bshark.compiler.model)</a>
+</li>
+      <li><a href="api/compilermodel.html#bshark.compiler.model.BinderDef.methods">methods (bshark.compiler.model.BinderDef attribute)</a>
+</li>
+      <li>
+    module
+
+      <ul>
+        <li><a href="api/aidl.html#module-bshark.aidl">bshark.aidl</a>
+</li>
+        <li><a href="api/compiler.html#module-bshark.compiler">bshark.compiler</a>
+</li>
+        <li><a href="api/loader.html#module-bshark.compiler.loader">bshark.compiler.loader</a>
+</li>
+        <li><a href="api/compilermodel.html#module-bshark.compiler.model">bshark.compiler.model</a>
+</li>
+        <li><a href="api/compilerutilities.html#module-bshark.compiler.util">bshark.compiler.util</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="N">N</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/aidl.html#bshark.aidl.Unit.name">name (bshark.aidl.Unit attribute)</a>
+
+      <ul>
+        <li><a href="api/compilermodel.html#bshark.compiler.model.FieldDef.name">(bshark.compiler.model.FieldDef attribute)</a>
+</li>
+        <li><a href="api/compilermodel.html#bshark.compiler.model.ImportDef.name">(bshark.compiler.model.ImportDef property)</a>
+</li>
+        <li><a href="api/compilermodel.html#bshark.compiler.model.MethodDef.name">(bshark.compiler.model.MethodDef attribute)</a>
+</li>
+        <li><a href="api/compilermodel.html#bshark.compiler.model.ParameterDef.name">(bshark.compiler.model.ParameterDef attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/compiler.html#bshark.compiler._compiler.NodeVisitor">NodeVisitor (class in bshark.compiler._compiler)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="O">O</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/compilermodel.html#bshark.compiler.model.MethodDef.oneway">oneway (bshark.compiler.model.MethodDef attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/compilermodel.html#bshark.compiler.model.Direction.OUT">OUT (bshark.compiler.model.Direction attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="P">P</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/aidl.html#bshark.aidl.Unit.package">package (bshark.aidl.Unit attribute)</a>
+</li>
+      <li><a href="api/compilermodel.html#bshark.compiler.model.ParameterDef">ParameterDef (class in bshark.compiler.model)</a>
+</li>
+      <li><a href="api/aidl.html#bshark.aidl.Type.PARCELABLE">PARCELABLE (bshark.aidl.Type attribute)</a>
+</li>
+      <li><a href="api/aidl.html#bshark.aidl.Type.PARCELABLE_JAVA">PARCELABLE_JAVA (bshark.aidl.Type attribute)</a>
+</li>
+      <li><a href="api/compilermodel.html#bshark.compiler.model.ParcelableDef">ParcelableDef (class in bshark.compiler.model)</a>
+</li>
+      <li><a href="api/loader.html#bshark.compiler.BaseLoader.parse_aidl">parse_aidl() (bshark.compiler.BaseLoader method)</a>
+
+      <ul>
+        <li><a href="api/aidl.html#bshark.aidl.parse_aidl">(in module bshark.aidl)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/compiler.html#bshark.compiler._compiler.Compiler.parse_condition">parse_condition() (bshark.compiler._compiler.Compiler method)</a>
+</li>
+      <li><a href="api/loader.html#bshark.compiler.BaseLoader.parse_java">parse_java() (bshark.compiler.BaseLoader method)</a>
+
+      <ul>
+        <li><a href="api/aidl.html#bshark.aidl.parse_java">(in module bshark.aidl)</a>
+</li>
+      </ul></li>
+      <li><a href="api/loader.html#bshark.compiler.BaseLoader.parse_json">parse_json() (bshark.compiler.BaseLoader method)</a>
+</li>
+      <li><a href="api/compiler.html#bshark.compiler._compiler.Preprocessor">Preprocessor (class in bshark.compiler._compiler)</a>
+</li>
+      <li><a href="api/compilermodel.html#bshark.compiler.model.Primitive">Primitive (class in bshark.compiler.model)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="Q">Q</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/compilermodel.html#bshark.compiler.model.QImport">QImport (bshark.compiler.model attribute)</a>
+</li>
+      <li><a href="api/compiler.html#bshark.compiler._compiler.Preprocessor.qname">qname (bshark.compiler._compiler.Preprocessor property)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/compilermodel.html#bshark.compiler.model.QName">QName (bshark.compiler.model attribute)</a>
+</li>
+      <li><a href="api/compilermodel.html#bshark.compiler.model.ClassDef.qname">qname (bshark.compiler.model.ClassDef attribute)</a>
+
+      <ul>
+        <li><a href="api/compilermodel.html#bshark.compiler.model.ImportDef.qname">(bshark.compiler.model.ImportDef attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+</tr></table>
+
+<h2 id="R">R</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/compiler.html#bshark.compiler._compiler.Compiler.resolve_parcel_tracker">resolve_parcel_tracker() (bshark.compiler._compiler.Compiler method)</a>
+</li>
+      <li><a href="api/compiler.html#bshark.compiler._compiler.Compiler.resolved_imports">resolved_imports (bshark.compiler._compiler.Compiler property)</a>
+</li>
+      <li><a href="api/compilermodel.html#bshark.compiler.model.ReturnDef">ReturnDef (class in bshark.compiler.model)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/compilermodel.html#bshark.compiler.model.MethodDef.retval">retval (bshark.compiler.model.MethodDef attribute)</a>
+</li>
+      <li><a href="api/compiler.html#bshark.compiler._compiler.Preprocessor.rpath">rpath (bshark.compiler._compiler.Preprocessor property)</a>
+</li>
+      <li><a href="api/compilermodel.html#bshark.compiler.model.RPath">RPath (bshark.compiler.model attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="S">S</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/aidl.html#bshark.aidl.Type.SPECIAL">SPECIAL (bshark.aidl.Type attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/compilermodel.html#bshark.compiler.model.Stop">Stop (class in bshark.compiler.model)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="T">T</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/compilermodel.html#bshark.compiler.model.MethodDef.tc">tc (bshark.compiler.model.MethodDef attribute)</a>
+</li>
+      <li><a href="api/loader.html#bshark.compiler.BaseLoader.to_absolute">to_absolute() (bshark.compiler.BaseLoader method)</a>
+</li>
+      <li><a href="api/compilermodel.html#bshark.compiler.model.to_json">to_json() (in module bshark.compiler.model)</a>
+</li>
+      <li><a href="api/compilerutilities.html#bshark.compiler.util.to_qname">to_qname() (in module bshark.compiler.util)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/compiler.html#bshark.compiler._compiler.Compiler.trace_local">trace_local() (bshark.compiler._compiler.Compiler method)</a>
+</li>
+      <li><a href="api/aidl.html#bshark.aidl.Unit.type">type (bshark.aidl.Unit attribute)</a>
+
+      <ul>
+        <li><a href="api/compilermodel.html#bshark.compiler.model.ClassDef.type">(bshark.compiler.model.ClassDef attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="api/aidl.html#bshark.aidl.Type">Type (class in bshark.aidl)</a>
+</li>
+      <li><a href="api/compiler.html#bshark.compiler._compiler.TypeHandler">TypeHandler (class in bshark.compiler._compiler)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="U">U</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/aidl.html#bshark.aidl.Type.UNDEFINED">UNDEFINED (bshark.aidl.Type attribute)</a>
+</li>
+      <li><a href="api/compiler.html#bshark.compiler._compiler.Compiler.unit">unit (bshark.compiler._compiler.Compiler property)</a>
+
+      <ul>
+        <li><a href="api/compilermodel.html#bshark.compiler.model.ImportDef.unit">(bshark.compiler.model.ImportDef attribute)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/aidl.html#bshark.aidl.Unit">Unit (class in bshark.aidl)</a>
+</li>
+      <li><a href="api/compilermodel.html#bshark.compiler.model.UnsupportedTypeError">UnsupportedTypeError (class in bshark.compiler.model)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="V">V</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/compiler.html#bshark.compiler._compiler.NodeVisitor.visit">visit() (bshark.compiler._compiler.NodeVisitor method)</a>
+</li>
+      <li><a href="api/compiler.html#bshark.compiler._compiler.NodeVisitor.visit_assignment_expression">visit_assignment_expression() (bshark.compiler._compiler.NodeVisitor method)</a>
+</li>
+      <li><a href="api/compiler.html#bshark.compiler._compiler.NodeVisitor.visit_if_statement">visit_if_statement() (bshark.compiler._compiler.NodeVisitor method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/compiler.html#bshark.compiler._compiler.NodeVisitor.visit_local_variable_declaration">visit_local_variable_declaration() (bshark.compiler._compiler.NodeVisitor method)</a>
+</li>
+      <li><a href="api/compiler.html#bshark.compiler._compiler.NodeVisitor.visit_method_invocation">visit_method_invocation() (bshark.compiler._compiler.NodeVisitor method)</a>
+</li>
+      <li><a href="api/compiler.html#bshark.compiler._compiler.NodeVisitor.visit_return_statement">visit_return_statement() (bshark.compiler._compiler.NodeVisitor method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+
+
+                </article>
+              
+              
+              
+              
+              
+                <footer class="prev-next-footer">
+                  
+<div class="prev-next-area">
+</div>
+                </footer>
+              
+            </div>
+            
+            
+              
+                <div class="bd-sidebar-secondary bd-toc"></div>
+              
+            
+          </div>
+          <footer class="bd-footer-content">
+            
+          </footer>
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Scripts loaded after <body> so the DOM is not blocked -->
+  <script src="_static/scripts/bootstrap.js?digest=8d27b9dea8ad943066ae"></script>
+<script src="_static/scripts/pydata-sphinx-theme.js?digest=8d27b9dea8ad943066ae"></script>
+
+  <footer class="bd-footer">
+<div class="bd-footer__inner bd-page-width">
+  
+    <div class="footer-items__start">
+      
+        <div class="footer-item">
+
+  <p class="copyright">
+    
+      © Copyright 2024, MatrixEditor.
+      <br/>
+    
+  </p>
+</div>
+      
+        <div class="footer-item">
+
+  <p class="sphinx-version">
+    Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 7.3.7.
+    <br/>
+  </p>
+</div>
+      
+    </div>
+  
+  
+  
+    <div class="footer-items__end">
+      
+        <div class="footer-item">
+<p class="theme-version">
+  Built with the <a href="https://pydata-sphinx-theme.readthedocs.io/en/stable/index.html">PyData Sphinx Theme</a> 0.15.2.
+</p></div>
+      
+    </div>
+  
+</div>
+
+  </footer>
+  </body>
+</html>
