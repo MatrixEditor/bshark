@@ -1,9 +1,5 @@
-from os.path import isdir, join
 from platform import system
-
-from setuptools import Extension, find_packages, setup
-from setuptools.command.build import build
-from wheel.bdist_wheel import bdist_wheel
+from setuptools import Extension, setup
 
 setup(
     name="bshark",
