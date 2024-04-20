@@ -39,6 +39,53 @@ python3 -m bshark.compiler         \ # base command
     android.accounts.Account       \ # target class to compile (AIDL file required)
 ```
 
+### Manual Message Parsing:
+
+In order to parse a message, we need the compiled binder interface and all necessary
+parcelable definitions involved. Consider we want to decode a message from the
+`android.app.IActivityManager` with transaction code `63`. First, we have to compile
+the binder interface:
+```python
+from bshark.compiler import BaseLoader, Compiler
+from bshark.parcel import parse
+
+loader = BaseLoader(['/path/to/android-java-root/'])
+(unit,) = loader.import_("android.app.IActivityManager")
+
+# A single call to compile is enough. It will replace the
+# cached unit and place the binder definition in it.
+c = Compiler(unit, loader)
+bdef = c.compile()
+
+data = ...
+msg = parse(
+    data,           # recevied data
+    63,             # transaction code
+    loader,         # loader
+    version=...,    # Android API version
+)
+```
+
+The output would look something like this:
+```python
+IncomingMessage(
+    smp=3254779908,
+    work_suid=4294967295,
+    env=<Environment.SYST: 1398362964>,
+    descriptor='android.app.IActivityManager',
+    data={
+        'connection': {
+            'type': 1936206469,
+            'flags': 275,
+            'handle': 41,
+            'cookie': 0,
+            'status': 201326593
+        },
+        'stable': 0
+    }
+)
+```
+
 ### Capturing Binder transactions:
 In order to receive binder transactions, we have to use a custom
 `TransactionListener`, which wil be used later on by an `Agent`.

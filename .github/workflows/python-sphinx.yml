@@ -22,12 +22,12 @@ jobs:
 
       - name: Install doxygen
         run: |
-           wget https://github.com/doxygen/doxygen/releases/download/Release_1_1_10/doxygen-1.1.10.linux.bin.tar.gz
-           tar xzvf doxygen-1.1.10.linux.bin.tar.gz
-           cd doxygen-1.1.10
+           wget https://github.com/doxygen/doxygen/releases/download/Release_1_10_0/doxygen-1.10.0.linux.bin.tar.gz
+           tar xzvf doxygen-1.10.0.linux.bin.tar.gz
+           cd doxygen-1.10.0
            sudo make install
            cd ..
-           rm -rf doxygen-1.1.10*
+           rm -rf doxygen-1.10.0*
 
       - name: Build
         # Create .nojekyll file to disable Jekyll processing

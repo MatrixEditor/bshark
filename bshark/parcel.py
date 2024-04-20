@@ -22,21 +22,13 @@
 import enum
 import typing as t
 
-from caterpillar.shortcuts import struct, LittleEndian, ctx, unpack
-from caterpillar.fields import uint32, Memory, Enum, singleton, String, Computed
+from caterpillar.shortcuts import struct, LittleEndian, ctx, unpack, this
+from caterpillar.fields import *
 
-from bshark.parser import Parser
+from bshark.parser import Parser, string16
 from bshark.compiler import BaseLoader
 from bshark.compiler.model import Direction
 
-
-@singleton
-class string16(String):
-    def __init__(self):
-        super().__init__(..., encoding="utf-16-le")
-
-    def __size__(self, context) -> int:
-        return uint32.unpack_single(context) * 2
 
 
 class Environment(enum.IntEnum):
@@ -45,9 +37,9 @@ class Environment(enum.IntEnum):
 
 
 def parse_incoming_message(data: memoryview, context):
-    parser_cls = getattr(context._root, "parser_cls", Parser)
+    parser_cls = getattr(context._root, "parser_cls", None)
     context.direction = Direction.IN
-    return parser_cls(data)
+    return (parser_cls or Parser)(data)
 
 
 @struct(order=LittleEndian)
@@ -58,7 +50,7 @@ class IncomingMessage:
     smp: uint32
     """Strict Mode Policy"""
 
-    with ctx._root.android_version >= 11:
+    with If(ctx._root.android_version >= 11):
         # Some fields should be parsed only if the Android
         # version is 11 or higher.
         work_suid: uint32
@@ -67,7 +59,7 @@ class IncomingMessage:
         env: Enum(Environment, uint32)
         """Environment"""
 
-    with ctx._root.android_version == 10:
+    with ElseIf(ctx._root.android_version == 10):
         work_suid: uint32
         """Work Source UID"""
 
@@ -79,15 +71,30 @@ class IncomingMessage:
 
 
 def parse_outgoing_message(data: memoryview, context):
-    parser_cls = getattr(context._root, "parser_cls", Parser)
+    parser_cls = getattr(context._root, "parser_cls", None)
     context.direction = Direction.OUT
-    return parser_cls(data)
+    return (parser_cls or Parser)(data)
 
 
-@struct
+@struct(order=LittleEndian)
 class OutgoingMessage:
+    #: The first fields define the interface token for the message,
+    #: which is later used to identify the binder interface. It MUST
+    #: be provided through the 'unpack' call.
     descriptor: Computed(ctx._root.interface)
-    data: Memory(...) >> parse_outgoing_message
+
+    #: The first four bytes specify whether an error occurred during
+    #: the transaction.
+    error_code: int32
+    error: this.error_code >> {
+        # By default, just return the error code
+        DEFAULT_OPTION: ctx._value
+    }
+
+    with this.error == 0:
+        # The outgoing message will be parsed only if the error code
+        # is not set.
+        data: Memory(...) >> parse_outgoing_message
 
 
 def parse(
@@ -97,6 +104,7 @@ def parse(
     version: int,
     descriptor: t.Optional[str] = None,
     in_: bool = True,
+    parser_cls: t.Optional[t.Type[Parser]] = None,
 ) -> IncomingMessage | OutgoingMessage:
     """
     Parses an incoming or outgoing message based on the given parameters.
@@ -124,4 +132,5 @@ def parse(
         loader=loader,
         android_version=version,
         interface=descriptor,
+        parser_cls=parser_cls,
     )
