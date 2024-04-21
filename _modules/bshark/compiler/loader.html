@@ -380,7 +380,7 @@ document.write(`
 
 <span class="kn">from</span> <span class="nn">tree_sitter</span> <span class="kn">import</span> <span class="n">Node</span>
 
-
+<span class="kn">from</span> <span class="nn">bshark</span> <span class="kn">import</span> <span class="n">FULL_AIDL_EXT</span>
 <span class="kn">from</span> <span class="nn">bshark.aidl</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">JAVA</span><span class="p">,</span>
     <span class="n">AIDL</span><span class="p">,</span>
@@ -595,8 +595,13 @@ document.write(`
             <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">abs_dir_path</span><span class="si">!r}</span><span class="s2"> is not a directory&quot;</span><span class="p">)</span>
 
         <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="n">filteraidl</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">abs_dir_path</span><span class="p">)):</span>
-            <span class="n">result</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">load_aidl</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">rpath</span><span class="p">,</span> <span class="n">fname</span><span class="p">)))</span>
+        <span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">abs_dir_path</span><span class="p">):</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+            <span class="k">match</span> <span class="n">ext</span><span class="p">:</span>
+                <span class="k">case</span> <span class="s2">&quot;.aidl&quot;</span><span class="p">:</span>
+                    <span class="n">result</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">load_aidl</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">abs_dir_path</span><span class="p">,</span> <span class="n">fname</span><span class="p">)))</span>
+                <span class="k">case</span> <span class="s2">&quot;.json&quot;</span><span class="p">:</span>
+                    <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parse_json</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">abs_dir_path</span><span class="p">,</span> <span class="n">fname</span><span class="p">)))</span>
         <span class="k">return</span> <span class="n">result</span>
 
     <span class="k">def</span> <span class="nf">_import_one</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rpath</span><span class="p">:</span> <span class="n">RPath</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">t</span><span class="o">.</span><span class="n">List</span><span class="p">[</span><span class="n">Unit</span><span class="p">]:</span>

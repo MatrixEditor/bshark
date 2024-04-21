@@ -412,6 +412,15 @@ Android Open Source Repository. For instance, the input name <code class="code d
 should be located in <code class="code docutils literal notranslate"><span class="pre">$ANDROID_SRC/com/example/SomeClass.[aidl|java|json]</span></code>.</p>
 </div>
 </section>
+<section id="batch-compilation">
+<h2>Batch Compilation<a class="headerlink" href="#batch-compilation" title="Link to this heading">#</a></h2>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3<span class="w"> </span>-m<span class="w"> </span>bshark.compiler<span class="w"> </span>-I<span class="w"> </span><span class="nv">$ANDROID_SRC</span><span class="w"> </span>batch-compile<span class="w"> </span>-o<span class="w"> </span><span class="nv">$OUTPUT_DIR</span><span class="w"> </span>--recursive<span class="w"> </span>--force
+</pre></div>
+</div>
+<p>This will generate a JSON file for <strong>ALL</strong> AIDL files in the <code class="code docutils literal notranslate"><span class="pre">$ANDROID_SRC</span></code> directory
+under the <code class="code docutils literal notranslate"><span class="pre">$OUTPUT_DIR</span></code> directory. Note that this command tires to import all previously
+compiled AIDL files from the output directory first.</p>
+</section>
 <section id="inspecting-aidl-files">
 <h2>Inspecting AIDL files<a class="headerlink" href="#inspecting-aidl-files" title="Link to this heading">#</a></h2>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3<span class="w"> </span>-m<span class="w"> </span>bshark.compiler<span class="w"> </span>-I<span class="w"> </span><span class="nv">$ANDROID_SRC</span><span class="w"> </span>info<span class="w"> </span><span class="nv">$CLASS_NAME</span>
@@ -540,6 +549,7 @@ parser will try to decode as much details as poosible from the received data.</p
   <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#compiling-aidl">Compiling AIDL</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#batch-compilation">Batch Compilation</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#inspecting-aidl-files">Inspecting AIDL files</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#decoding-transactions">Decoding Transactions</a></li>
 </ul>
