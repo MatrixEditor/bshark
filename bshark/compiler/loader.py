@@ -25,7 +25,7 @@ import typing as t
 
 from tree_sitter import Node
 
-
+from bshark import FULL_AIDL_EXT
 from bshark.aidl import (
     JAVA,
     AIDL,
@@ -223,8 +223,13 @@ class BaseLoader:
             raise FileNotFoundError(f"{abs_dir_path!r} is not a directory")
 
         result = []
-        for fname in filteraidl(os.listdir(abs_dir_path)):
-            result.extend(self.load_aidl(os.path.join(rpath, fname)))
+        for fname in os.listdir(abs_dir_path):
+            _, ext = os.path.splitext(fname)
+            match ext:
+                case ".aidl":
+                    result.extend(self.load_aidl(os.path.join(abs_dir_path, fname)))
+                case ".json":
+                    result.append(self.parse_json(os.path.join(abs_dir_path, fname)))
         return result
 
     def _import_one(self, rpath: RPath) -> t.List[Unit]:

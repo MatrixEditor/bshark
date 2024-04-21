@@ -39,6 +39,17 @@ python3 -m bshark.compiler         \ # base command
     android.accounts.Account       \ # target class to compile (AIDL file required)
 ```
 
+#### Batch compilation
+
+Batch compilation is supported in the same way in the command line interface.
+```bash
+python3 -m bshark.compiler        \ # base commmand
+    -I $ANDROID_SRC               \ # include directories (Android source required)
+    batch-compile                 \ # action
+    -o $OUTPUT_DIR                \ # output directory
+    [--recursive] [--force]         # options
+```
+
 ### Manual Message Parsing:
 
 In order to parse a message, we need the compiled binder interface and all necessary
@@ -94,6 +105,9 @@ from bshark.agent import TransactionListener
 from bshark.parcel import parse, IncomingMessage, OutgoingMessage
 
 loader = ... # the loader must store compiled Parcelable definitions
+# e.g.
+loader = BaseLoader(['/path/to/compiled-files-root/'])
+loader.import_("*")
 
 class MyListener(TransactionListener):
     def on_transaction(self, code: int, data: bytes) -> None:

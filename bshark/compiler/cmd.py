@@ -23,6 +23,7 @@ import os
 import typing as t
 import argparse
 import shlex
+import pathlib
 
 from rich import print
 from rich.console import Console
@@ -32,6 +33,7 @@ from rich.live import Live
 from bshark.aidl import Type
 from bshark.compiler import BaseLoader, Preprocessor, Compiler
 from bshark.compiler.model import QName, to_json
+from bshark.compiler.util import get_qname
 
 
 console = Console()
@@ -71,7 +73,11 @@ def info(loader: BaseLoader, qname: QName) -> None:
 def compile_single(loader: BaseLoader, qname: QName, output: str, force: bool) -> None:
     """Compiles the given type."""
     with console.status(f"Importing [b]{qname}[/]..."):
-        units = loader.import_(qname)
+        try:
+            units = loader.import_(qname)
+        except ImportError:
+            console.log(f"[dark_orange]Not found:[/] {qname} - aborting")
+            return
 
     with console.status(f"Compiling [b]{qname}[/]..."):
         for unit in units:
@@ -103,9 +109,10 @@ def compile_single(loader: BaseLoader, qname: QName, output: str, force: bool) -
                         console.log(
                             f"[dark_orange]Not supported:[/] {c.info.qname} with {c.unit.type.name} - aborting"
                         )
-            except: # pylint: disable=bare-except
+                        continue
+            except:  # pylint: disable=bare-except
                 console.log(f"[red]Failed:[/] {c.info.qname} - aborting")
-                console.print_exception(show_locals=True)
+                # console.print_exception(show_locals=True)
                 return
 
             with open(output_path, "w", encoding="utf-8") as fp:
@@ -114,6 +121,39 @@ def compile_single(loader: BaseLoader, qname: QName, output: str, force: bool) -
             console.log(
                 f"[green]Compiled:[/] {c.info.qname} - {c.info.rpath} - {c.info.lang.name}"
             )
+
+
+def compile_batch(
+    loader: BaseLoader, output: str, force: bool, recursive: bool
+) -> None:
+    abs_out_dir = os.path.abspath(output)
+    os.makedirs(abs_out_dir, exist_ok=True)
+
+    files = set()
+    with console.status("Collecting AIDL files..."):
+        for search_root in loader.search_path:
+            abs_in_dir = os.path.abspath(search_root)
+            if not os.path.isdir(abs_in_dir):
+                continue
+
+            input_dir_pathobj = pathlib.Path(abs_in_dir)
+            aidl_files = []
+            if recursive:
+                aidl_files = input_dir_pathobj.rglob("*.aidl")
+            else:
+                aidl_files = input_dir_pathobj.glob("*.aidl")
+
+            files.update(
+                map(lambda x: get_qname(str(x).replace(abs_in_dir, "")), aidl_files)
+            )
+
+    console.log(f"Found [{'green' if len(files) > 0 else 'red'}]{len(files)} [/]AIDL files")
+    with console.status("Loading cached files..."):
+        loader.import_("*")
+
+    for file in sorted(files):
+        qname = str(file).replace(abs_in_dir, "").strip("/")
+        compile_single(loader, qname, abs_out_dir, force)
 
 
 def main(cmd: t.Optional[str] = None):
@@ -158,6 +198,32 @@ def main(cmd: t.Optional[str] = None):
         help="Force recompilation of the given type",
     )
     compilation_parser.set_defaults(func=compile_single)
+
+    batch_cp_parser = parsers.add_parser(
+        "batch-compile", help="Compiles all AIDL files in the given include directories"
+    )
+    batch_cp_parser.add_argument(
+        "-o",
+        dest="output",
+        type=str,
+        default=".",
+        help="The output directory for the generated files",
+    )
+    batch_cp_parser.add_argument(
+        "-r",
+        "--recursive",
+        dest="recursive",
+        action="store_true",
+        help="Recursively search for AIDL files in subdirectories",
+    )
+    batch_cp_parser.add_argument(
+        "-f",
+        "--force",
+        dest="force",
+        action="store_true",
+        help="Force recompilation of the given type",
+    )
+    batch_cp_parser.set_defaults(func=compile_batch)
 
     args = parser.parse_args(shlex.split(cmd) if cmd else None).__dict__
     loader = BaseLoader(args.pop("includes"))

@@ -61,6 +61,17 @@ declaration):
     Android Open Source Repository. For instance, the input name :code:`com.example.SomeClass.json`
     should be located in :code:`$ANDROID_SRC/com/example/SomeClass.[aidl|java|json]`.
 
+Batch Compilation
+-----------------
+
+.. code-block:: bash
+
+    python3 -m bshark.compiler -I $ANDROID_SRC batch-compile -o $OUTPUT_DIR --recursive --force
+
+This will generate a JSON file for **ALL** AIDL files in the :code:`$ANDROID_SRC` directory
+under the :code:`$OUTPUT_DIR` directory. Note that this command tires to import all previously
+compiled AIDL files from the output directory first.
+
 Inspecting AIDL files
 ---------------------
 

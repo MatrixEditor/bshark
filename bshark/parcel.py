@@ -32,8 +32,17 @@ from bshark.compiler.model import Direction
 
 
 class Environment(enum.IntEnum):
+    #: Default Android device environment
     SYST = int.from_bytes(b"TSYS", "little")
-    # TODO
+
+    #: Android VNDK (Vendor Native Development Kit)
+    VNDK = int.from_bytes(b"VNDK", "little")
+
+    #: Recovery mode
+    RECO = int.from_bytes(b"RECO", "little")
+
+    #: unknown mode
+    UNKN = int.from_bytes(b"UNKN", "little")
 
 
 def parse_incoming_message(data: memoryview, context):
