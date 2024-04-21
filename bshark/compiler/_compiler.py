@@ -67,6 +67,7 @@ PARCEL_QNAME = f"android.os.{PARCEL_TYPE_NAME}"
 def txt(node: Node) -> t.Optional[str]:
     return node.text.decode() if node else None
 
+
 # ---
 
 
@@ -338,7 +339,53 @@ class TypeHandler:
         return "..."
 
     def const_val_of(self, expr: Node, compiler: "Compiler") -> str:
-        return "..."
+        match expr.type:
+            case Constants.IDENTIFIER:
+                # Possibly a constant reference: try to resolve the value
+                constant = txt(expr)
+                if constant in compiler.info.members:
+                    field = compiler.info.members[constant]
+                else:
+                    # try super classes
+                    for name in compiler.info.extends + compiler.info.implements:
+                        idef = compiler.get_import(name)
+                        if not idef.unit:
+                            try:
+                                unit = compiler.loader.import_(idef.qname)[0]
+                            except (ImportError, FileNotFoundError, ValueError):
+                                return constant
+                        else:
+                            unit = idef.unit
+
+                        p = Preprocessor(unit)
+                        if constant in p.members:
+                            field = p.members[constant]
+                            break
+
+                if not field:
+                    return constant
+
+                declarator = field.child_by_field_name("declarator")
+                return self.const_val_of(declarator.child(2), compiler)
+
+            case Constants.INTEGER_LITERAL:
+                return int(txt(expr).strip("lL"))
+            case Constants.HEX_INTEGER_LITERAL:
+                return int(txt(expr).strip("lL"), 16)
+            case Constants.OCTAL_INTEGER_LITERAL:
+                return int(txt(expr).strip("lL"), 8)
+            case Constants.BINARY_INTEGER_LITERAL:
+                return int(txt(expr).strip("lL"), 2)
+            case Constants.STRING_LITERAL | Constants.CHARACTER_LITERAL:
+                return txt(expr)
+            case Constants.TRUE:
+                return True
+            case Constants.FALSE:
+                return False
+            case Constants.NULL_LITERAL:
+                return None
+            case _:
+                raise TypeError(f"Unsupported constant type {expr.type!r}")
 
 
 class NodeVisitor:
@@ -378,10 +425,6 @@ class NodeVisitor:
         if not self.compiler.is_target_assignment(expr, tracker):
             return []
 
-            # Local variable: we try to trace the value to the final field
-            # # assignment
-            # local_member = self.compiler.get_local_member(expr)
-            # member = self.compiler.trace_local(expr.body, local_member)
         member = self.compiler.get_assigned_member(expr)
         # retrieve the target Parcel method call and add
         # the new member to the list
@@ -420,15 +463,17 @@ class NodeVisitor:
         if cond:
             consequence = expr.child_by_field_name("consequence")
             alternative = expr.child_by_field_name("alternative")
-            # pylint: disable-next=protected-access
-            cond.consequence = self.compiler._parse_parcelable_java(
-                consequence.named_child(0), tracker
-            )
+            if consequence:
+                # pylint: disable-next=protected-access
+                cond.consequence = self.compiler._parse_parcelable_java(
+                    consequence, tracker
+                )
             if alternative:
                 # pylint: disable-next=protected-access
                 cond.alternative = self.compiler._parse_parcelable_java(
                     alternative.named_child(0), tracker
                 )
+            return [cond]
         return None
 
     def visit_method_invocation(
@@ -551,7 +596,6 @@ class Compiler:
 
         self.loader.ucache[self.info.qname] = definition
         return definition
-
 
     def as_binder(self) -> BinderDef:
         """Returns the given unit as a :class:`BinderDef`."""
@@ -711,6 +755,8 @@ class Compiler:
                 # But if there are no statements in the body, we can
                 # simply return an empty list
                 return members
+        else:
+            body = method
 
         for idx, statement in enumerate(body.named_children):
             if statement.type == Constants.EXPR_STATEMENT:
@@ -778,10 +824,9 @@ class Compiler:
         # The left operand must point to a member
         left = expr.named_child(0)
         if left.type == Constants.IDENTIFIER:
-            field_name = txt(left)
-        else:
-            field_name = left.child_by_field_name("field").text.decode()
-        return field_name if field_name in self.info.members else None
+            return txt(left)
+
+        return txt(left.child_by_field_name("field"))
 
     def parse_condition(self, expr: Node, tracker: str) -> t.Optional[ConditionDef]:
         """Parse an if statement and return a condition definition."""
@@ -789,12 +834,11 @@ class Compiler:
             return None
 
         condition = expr.named_child(0)
-        condition_expr = condition.named_child(0)
         # Currently, only binary expressions are accepted
-        if condition_expr.type != Constants.PARENTHESIZED_EXPR:
+        if condition.type != Constants.PARENTHESIZED_EXPR:
             return None
 
-        binary_expr = condition_expr.named_child(0)
+        binary_expr = condition.named_child(0)
         if binary_expr.type != Constants.BINARY_EXPR:
             return None
 
@@ -809,8 +853,11 @@ class Compiler:
                 continue
 
             const_val = left if child is right else right
-            name = txt(const_val.child_by_field_name("name"))
-            return ConditionDef(name, self.th.const_val_of(const_val, self), None, None)
+            name = txt(child.child_by_field_name("name"))
+            op = txt(binary_expr.child(1))
+            return ConditionDef(
+                name, self.th.const_val_of(const_val, self), op, None, None
+            )
 
         return None
 

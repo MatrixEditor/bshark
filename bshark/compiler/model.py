@@ -190,6 +190,7 @@ class ConditionDef:
 
     call: str
     check: str
+    op: str
     consequence: t.List[FieldDef]
     alternative: t.List[FieldDef]
 
@@ -297,7 +298,7 @@ def _load_field_from_json(doc: t.Dict[str, t.Any]) -> FieldDef | ConditionDef:
         return Stop()
 
     if "check" in doc:
-        cdef = ConditionDef(doc["call"], doc["check"], None, None)
+        cdef = ConditionDef(doc["call"], doc["check"], doc["op"], None, None)
         consequence = doc["consequence"]
         if consequence:
             cdef.consequence = []

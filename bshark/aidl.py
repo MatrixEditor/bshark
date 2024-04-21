@@ -47,6 +47,18 @@ class Constants:
     IDENTIFIER = "identifier"
     LOCAL_VAR_DECL = "local_variable_declaration"
 
+    # literal types
+    INTEGER_LITERAL = "decimal_integer_literal"
+    HEX_INTEGER_LITERAL = "hex_integer_literal"
+    OCTAL_INTEGER_LITERAL = "octal_integer_literal"
+    BINARY_INTEGER_LITERAL = "binary_integer_literal"
+    FLOAT_LITERAL = "float_literal"
+    TRUE = "true"
+    FALSE = "false"
+    NULL_LITERAL = "null"
+    CHARACTER_LITERAL = "character_literal"
+    STRING_LITERAL = "string_literal"
+
     # statement types
     EXPR_STATEMENT = "expression_statement"
     RETURN_STATMENT = "return_statement"
