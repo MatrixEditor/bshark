@@ -1,3 +1,3 @@
-caterpillar@git+https://github.com/MatrixEditor/caterpillar.git
+caterpillar@git+https://github.com/MatrixEditor/caterpillar.git@294fd100ad15323949c0d7ea7c9663a12c934f00
 rich
 tree-sitter
